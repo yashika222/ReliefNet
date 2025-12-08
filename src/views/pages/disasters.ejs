@@ -1,0 +1,63 @@
+<%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+
+<div class="container" style="padding: 24px;">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+    <h2 style="margin:0;">Live Disasters</h2>
+    <div id="last-updated" style="color:#666; font-size:14px;">
+      <% if (lastUpdatedAt) { %>
+        Last updated at <%= new Date(lastUpdatedAt).toLocaleString() %>
+      <% } else { %>
+        Last updated just now
+      <% } %>
+    </div>
+  </div>
+
+  <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+    <form action="/disasters/demo-start" method="post" style="display:inline-block;">
+      <button type="submit" class="btn btn-secondary">Start Demo</button>
+    </form>
+    <form action="/disasters/demo-stop" method="post" style="display:inline-block;">
+      <button type="submit" class="btn">Stop Demo</button>
+    </form>
+    <span id="demo-status" style="color:#888; font-size:13px;">Demo inactive</span>
+  </div>
+
+  <div id="disaster-list" class="row" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:16px;">
+    <% if (Array.isArray(disasters) && disasters.length) { %>
+      <% disasters.forEach(function(d) { %>
+        <div class="card" style="border:1px solid #eee; border-radius:8px; padding:16px; background:#fff;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+            <h3 style="margin:0; font-size:18px;"><%= d.title %></h3>
+            <span style="font-size:12px; padding:4px 8px; border-radius:12px; background:#f2f2f2;">
+              <%= d.type %>
+            </span>
+          </div>
+          <div style="color:#555; font-size:14px; margin-bottom:8px;">
+            <div><strong>Location:</strong> <%= d.location %></div>
+            <div><strong>Date:</strong> <%= d.date ? new Date(d.date).toLocaleDateString() : '' %></div>
+            <div><strong>Severity:</strong> <%= d.severity %></div>
+          </div>
+          <div style="margin-top:12px; display:flex; gap:8px;">
+            <a class="btn btn-primary" href="/donate?disasterId=<%= d.disasterId || d._id %>">Donate</a>
+            <a class="btn btn-secondary" href="/disasters/<%= d.disasterId || d._id %>">Details</a>
+          </div>
+        </div>
+      <% }); %>
+    <% } %>
+  </div>
+
+  <div id="empty-actions" style="margin:16px 0;">
+    <% if (!Array.isArray(disasters) || !disasters.length) { %>
+      <div>
+        No active disasters found.
+        <form action="/disasters/demo-seed" method="post" style="display:inline-block; margin-left:8px;">
+          <button type="submit" class="btn btn-secondary">Seed Demo Data</button>
+        </form>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<script src="/public/js/disasters.js"></script>
+
+

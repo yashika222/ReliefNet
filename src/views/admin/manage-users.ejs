@@ -1,0 +1,98 @@
+<main class="container-fluid py-4">
+  <header class="admin-page-header mb-4">
+    <div>
+      <h1 class="mb-1">Manage Users</h1>
+      <p class="text-muted mb-0">Approve accounts, monitor access, and keep every role in sync.</p>
+    </div>
+    <div class="admin-page-actions">
+      <a href="/admin/dashboard" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Back to dashboard
+      </a>
+    </div>
+  </header>
+
+  <section class="admin-stats-grid mb-4">
+    <article class="admin-stat-card">
+      <span class="admin-stat-card__label">Total users</span>
+      <span class="admin-stat-card__value"><%= stats.total %></span>
+    </article>
+    <article class="admin-stat-card">
+      <span class="admin-stat-card__label">Approved</span>
+      <span class="admin-stat-card__value text-success"><%= stats.approved %></span>
+    </article>
+    <article class="admin-stat-card">
+      <span class="admin-stat-card__label">Pending</span>
+      <span class="admin-stat-card__value text-warning"><%= stats.pending %></span>
+    </article>
+    <article class="admin-stat-card">
+      <span class="admin-stat-card__label">Rejected</span>
+      <span class="admin-stat-card__value text-secondary"><%= stats.rejected %></span>
+    </article>
+    <article class="admin-stat-card">
+      <span class="admin-stat-card__label">Blocked</span>
+      <span class="admin-stat-card__value text-danger"><%= stats.blocked %></span>
+    </article>
+  </section>
+
+  <section class="admin-panel">
+    <div class="admin-panel__heading">
+      <h2>User directory</h2>
+      <p class="text-muted small mb-0">This list shows the latest <%= users.length %> accounts. Search and advanced filters are coming next.</p>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle" id="usersTable">
+        <thead class="table-light">
+          <tr>
+            <th>User</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Joined</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!users.length) { %>
+            <tr>
+              <td colspan="5" class="text-center py-4 text-muted">No users found.</td>
+            </tr>
+          <% } %>
+          <% users.forEach(function(u) { %>
+            <tr>
+              <td>
+                <div class="fw-semibold"><%= u.name || 'Unnamed user' %></div>
+                <div class="text-muted small"><%= u.email %></div>
+              </td>
+              <td><span class="badge bg-light text-dark text-uppercase"><%= u.role %></span></td>
+              <td>
+                <% if (u.approvalStatus === 'approved') { %>
+                  <span class="badge bg-success-subtle text-success-emphasis">Approved</span>
+                <% } else if (u.approvalStatus === 'rejected') { %>
+                  <span class="badge bg-secondary-subtle text-secondary-emphasis">Rejected</span>
+                <% } else { %>
+                  <span class="badge bg-warning-subtle text-warning-emphasis">Pending</span>
+                <% } %>
+                <% if (u.blocked) { %>
+                  <span class="badge bg-danger-subtle text-danger-emphasis ms-1">Blocked</span>
+                <% } %>
+              </td>
+              <td><%= u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—' %></td>
+              <td class="text-end">
+                <% if (u.approvalStatus !== 'approved') { %>
+                  <button class="btn btn-sm btn-primary approve-btn" data-id="<%= u._id %>">
+                    <i class="bi bi-check-circle"></i> Approve
+                  </button>
+                <% } else { %>
+                  <span class="text-muted small">No actions</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <script src="/public/js/admin/manage-users.js" defer></script>
+</main>
+

@@ -1,0 +1,152 @@
+<main class="container-fluid py-4">
+  <header class="admin-page-header mb-4">
+    <div>
+      <h1>Manage Volunteers</h1>
+      <p class="text-muted mb-0">
+        Track volunteer performance, assign tasks, and keep the response force ready.
+      </p>
+    </div>
+    <div class="admin-page-actions">
+      <button type="button" class="btn btn-outline-primary" id="refreshBtn">
+        <i class="bi bi-arrow-clockwise"></i> Refresh Data
+      </button>
+    </div>
+  </header>
+
+  <div id="alertHost" class="mb-3"></div>
+
+  <!-- Volunteer Summary Cards -->
+  <section class="admin-stats-grid" id="summaryCards">
+    <article class="admin-stat-card">
+      <span class="admin-stat-card__label">Total Volunteers</span>
+      <span class="admin-stat-card__value" id="totalVolunteers">0</span>
+    </article>
+    <article class="admin-stat-card">
+      <span class="admin-stat-card__label">Active Volunteers</span>
+      <span class="admin-stat-card__value" id="activeVolunteers">0</span>
+    </article>
+    <article class="admin-stat-card">
+      <span class="admin-stat-card__label">Pending Approvals</span>
+      <span class="admin-stat-card__value" id="pendingVolunteers">0</span>
+    </article>
+    <article class="admin-stat-card">
+      <span class="admin-stat-card__label">Rejected Applications</span>
+      <span class="admin-stat-card__value" id="rejectedVolunteers">0</span>
+    </article>
+    <article class="admin-stat-card">
+      <span class="admin-stat-card__label">Blocked Volunteers</span>
+      <span class="admin-stat-card__value" id="blockedVolunteers">0</span>
+    </article>
+    <article class="admin-stat-card">
+      <span class="admin-stat-card__label">Total Tasks Assigned</span>
+      <span class="admin-stat-card__value" id="totalTasks">0</span>
+    </article>
+    <article class="admin-stat-card">
+      <span class="admin-stat-card__label">Tasks Completed</span>
+      <span class="admin-stat-card__value" id="completedTasks">0</span>
+    </article>
+    <article class="admin-stat-card">
+      <span class="admin-stat-card__label">Tasks In Progress</span>
+      <span class="admin-stat-card__value" id="inProgressTasks">0</span>
+    </article>
+    <article class="admin-stat-card highlight">
+      <span class="admin-stat-card__label">Overdue Tasks</span>
+      <span class="admin-stat-card__value" id="overdueTasks">0</span>
+      <span class="admin-stat-card__meta text-danger" id="autoWarningMeta">Auto alerts ready</span>
+    </article>
+    <article class="admin-stat-card">
+      <span class="admin-stat-card__label">Warned Tasks</span>
+      <span class="admin-stat-card__value" id="warnedTasks">0</span>
+    </article>
+  </section>
+
+  <!-- Volunteer Directory -->
+  <section class="admin-panel mt-4">
+    <div class="admin-panel__heading">
+      <h2>Volunteer Directory</h2>
+      <p class="text-muted small mb-0">
+        Search, filter, or drill into volunteer activity. All actions update the database instantly.
+      </p>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-12 col-md-4">
+        <label class="form-label">Search volunteers</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input type="search" id="searchInput" class="form-control" placeholder="Name or email">
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="form-label">Status</label>
+        <select id="statusFilter" class="form-select">
+          <option value="">All statuses</option>
+          <option value="approved">Approved</option>
+          <option value="pending">Pending</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="form-label">Sort by</label>
+        <select id="sortFilter" class="form-select">
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="name">Name A → Z</option>
+          <option value="tasks">Most tasks assigned</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label d-block">Blocked state</label>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="blockedToggle">
+          <label class="form-check-label" for="blockedToggle">Show blocked only</label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Volunteer Table -->
+  <section class="admin-table-card mt-4">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle" id="volunteersTable">
+        <thead class="table-light">
+          <tr>
+            <th>Volunteer</th>
+            <th>Contact</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Tasks</th>
+            <th>Overdue</th>
+            <th>Last Activity</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="volunteersTableBody">
+          <tr>
+            <td colspan="8" class="text-center py-4">
+              <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+              <span class="ms-2 text-muted">Loading volunteers...</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 pt-3">
+      <div class="text-muted small" id="tableMeta"></div>
+      <nav>
+        <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+      </nav>
+    </div>
+  </section>
+
+  <!-- ✅ Modal Partial -->
+  <% try { %>
+    <%- include('../partials/volunteer-modals') %>
+  <% } catch (e) { %>
+    <!-- Safe fallback if partial missing -->
+    <div class="text-muted small mt-3">Volunteer modals not loaded yet.</div>
+  <% } %>
+
+  <!-- ✅ JS File -->
+  <script src="/public/js/admin/manage-volunteers.js" defer></script>
+</main>

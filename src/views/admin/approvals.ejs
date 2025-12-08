@@ -1,0 +1,169 @@
+<main class="container-fluid py-4">
+  <header class="mb-4">
+    <h1>Approvals Desk</h1>
+    <p class="text-muted">Verify NGOs and campaigns quickly to keep relief operations legitimate and effective.</p>
+  </header>
+
+  <div id="approvalAlertHost" class="mb-3"></div>
+
+  <!-- === NGO and Campaign Stats === -->
+  <section class="admin-stats-grid" id="approvalStats">
+    <article class="admin-stat-card"><span class="admin-stat-card__label">Total NGOs</span><span class="admin-stat-card__value" id="ngoTotal">0</span></article>
+    <article class="admin-stat-card"><span class="admin-stat-card__label">Pending NGOs</span><span class="admin-stat-card__value" id="ngoPending">0</span></article>
+    <article class="admin-stat-card"><span class="admin-stat-card__label">Approved NGOs</span><span class="admin-stat-card__value" id="ngoApproved">0</span></article>
+    <article class="admin-stat-card"><span class="admin-stat-card__label">Rejected NGOs</span><span class="admin-stat-card__value" id="ngoRejected">0</span></article>
+    <article class="admin-stat-card"><span class="admin-stat-card__label">Total Campaigns</span><span class="admin-stat-card__value" id="campaignTotal">0</span></article>
+    <article class="admin-stat-card"><span class="admin-stat-card__label">Pending Campaigns</span><span class="admin-stat-card__value" id="campaignPending">0</span></article>
+    <article class="admin-stat-card"><span class="admin-stat-card__label">Approved Campaigns</span><span class="admin-stat-card__value" id="campaignApproved">0</span></article>
+    <article class="admin-stat-card"><span class="admin-stat-card__label">Rejected Campaigns</span><span class="admin-stat-card__value" id="campaignRejected">0</span></article>
+  </section>
+
+  <!-- === NGO Approvals === -->
+  <section class="admin-approvals-grid">
+    <div class="admin-panel">
+      <div class="admin-panel__heading">
+        <h2>NGO Registration Review</h2>
+        <p class="text-muted small mb-0">Review documentation, verify authenticity, and approve trusted NGOs.</p>
+      </div>
+      <div class="row g-3 mb-3">
+        <div class="col-md-5">
+          <label class="form-label">Search NGOs</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="search" id="ngoSearch" class="form-control" placeholder="Name, email, registration no.">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Status</label>
+          <select id="ngoStatusFilter" class="form-select">
+            <option value="">All statuses</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Sort</label>
+          <select id="ngoSort" class="form-select">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="name">Name A → Z</option>
+          </select>
+        </div>
+      </div>
+      <div id="ngoResults" class="approval-card-list">
+        <div class="approval-empty-state">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="mt-2 text-muted">Loading NGO applications…</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- === Campaign Approvals === -->
+    <div class="admin-panel">
+      <div class="admin-panel__heading">
+        <h2>Campaign Approval Queue</h2>
+        <p class="text-muted small mb-0">Approve relief campaigns only when requirements are satisfied.</p>
+      </div>
+      <div class="row g-3 mb-3">
+        <div class="col-md-5">
+          <label class="form-label">Search Campaigns</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="search" id="campaignSearch" class="form-control" placeholder="Campaign title or NGO">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Status</label>
+          <select id="campaignStatusFilter" class="form-select">
+            <option value="">All statuses</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Sort</label>
+          <select id="campaignSort" class="form-select">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="title">Title A → Z</option>
+          </select>
+        </div>
+      </div>
+      <div id="campaignResults" class="approval-card-list">
+        <div class="approval-empty-state">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="mt-2 text-muted">Loading campaigns…</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- === Modals === -->
+  <div class="modal fade" id="ngoDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">NGO Profile</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="ngoDetailContent">
+          <p class="text-muted mb-0">Loading NGO details…</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-success" id="ngoDetailApprove">
+            <i class="bi bi-check-circle"></i> Approve NGO
+          </button>
+          <button type="button" class="btn btn-warning" id="ngoDetailReject">
+            <i class="bi bi-x-circle"></i> Reject NGO
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="campaignDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Campaign Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="campaignDetailContent">
+          <p class="text-muted mb-0">Loading campaign…</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-success" id="campaignDetailApprove">
+            <i class="bi bi-check-circle"></i> Approve Campaign
+          </button>
+          <button type="button" class="btn btn-warning" id="campaignDetailReject">
+            <i class="bi bi-x-circle"></i> Reject Campaign
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="approvalsConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="approvalsConfirmTitle">Confirm Action</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="approvalsConfirmMessage">
+          Are you sure you want to continue?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="approvalsConfirmBtn">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/public/js/admin/approvals.js" defer></script>
+</main>

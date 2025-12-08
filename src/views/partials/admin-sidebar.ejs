@@ -1,0 +1,15 @@
+<aside class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" style="min-height: 100vh; border-right: 1px solid #e5e7eb;">
+  <div class="position-sticky pt-3">
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link <%= activePage==='dashboard' ? 'active' : '' %>" href="/admin/dashboard">Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link <%= activePage==='manage-volunteers' ? 'active' : '' %>" href="/admin/manage-volunteers">Manage Volunteers</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link <%= activePage==='approvals' ? 'active' : '' %>" href="/admin/approvals">Approvals</a>
+      </li>
+    </ul>
+  </div>
+</aside>

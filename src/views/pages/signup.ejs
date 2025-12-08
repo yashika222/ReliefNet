@@ -1,0 +1,88 @@
+<section class="auth-page">
+  <div class="auth-container">
+    <div class="auth-header">
+      <div class="auth-logo">DR</div>
+      <h2 class="auth-title">Join Our Mission</h2>
+      <p class="auth-subtitle">
+        Create your disaster relief account and start making a difference
+      </p>
+    </div>
+    
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="auth-error">
+        <%= error %>
+      </div>
+    <% } %>
+    
+    <form class="auth-form" action="/auth/signup" method="POST">
+      <div class="auth-form-grid">
+        <div class="auth-form-group">
+          <label for="name" class="auth-form-label">Full Name</label>
+          <input 
+            id="name" 
+            name="name" 
+            type="text" 
+            required 
+            class="auth-form-input"
+            placeholder="Enter your full name"
+          />
+        </div>
+        
+        <div class="auth-form-group">
+          <label for="email" class="auth-form-label">Email Address</label>
+          <input 
+            id="email" 
+            name="email" 
+            type="email" 
+            required 
+            class="auth-form-input"
+            placeholder="Enter your email"
+          />
+        </div>
+        
+        <div class="auth-form-group">
+          <label for="password" class="auth-form-label">Password</label>
+          <input 
+            id="password" 
+            name="password" 
+            type="password" 
+            required 
+            class="auth-form-input"
+            placeholder="Create a password (min 6 characters)"
+          />
+        </div>
+        
+        <div class="auth-form-group">
+          <label for="role" class="auth-form-label">Select Role</label>
+          <select 
+            id="role" 
+            name="role" 
+            required
+            class="auth-form-select"
+          >
+            <option value="admin">👑 Admin</option>
+            <option value="ngo">🏢 NGO</option>
+            <option value="donor" selected>💝 Donor</option>
+            <option value="volunteer">👷 Volunteer</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="submit" class="auth-form-button">
+          <svg class="auth-form-button-icon" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
+          </svg>
+          Create Account
+        </button>
+      </div>
+
+      <div class="auth-form-link">
+        <p class="auth-form-link-text">
+          Already have an account? 
+          <a href="/auth/login">Sign in here</a>
+        </p>
+      </div>
+    </form>
+  </div>
+</section>

@@ -1,0 +1,159 @@
+<!-- Hero -->
+<section class="hero has-image" style="position:relative; overflow:hidden;">
+  <img src="/public/img/hero-wave.svg" alt="" aria-hidden="true" style="position:absolute; bottom:0; left:0; right:0; width:100%; pointer-events:none; opacity:.8;" />
+  <div class="container-wide" style="position:relative; z-index:1; display:grid; grid-template-columns:1fr; gap:2rem; align-items:center;">
+    <div class="hero-text-card">
+      <h1 class="hero-title">Together, We Respond Faster</h1>
+      <p class="hero-subtitle">Coordinate relief, request urgent assistance, and donate essential supplies — all in one place.</p>
+      <div class="hero-actions">
+        <a href="/request-help" class="hero-btn hero-btn-primary"><span>🚨</span> Request Help</a>
+        <a href="/donate" class="hero-btn hero-btn-secondary"><span>💝</span> Donate Now</a>
+      </div>
+    </div>
+    <div class="sm:hidden md:block" style="justify-self:center;">
+      <img src="/public/img/relief-illustration.svg" alt="Relief support" style="max-width:520px; width:100%; height:auto;"/>
+    </div>
+  </div>
+</section>
+
+<!-- Recent Requests -->
+<section class="section bg-white">
+  <div class="container-wide">
+    <h2 class="page-header-title" style="margin-bottom: 1rem;">Recent Help Requests</h2>
+    <p class="resources-subtitle" style="margin-bottom: 1.5rem;">Latest requests submitted by people in need</p>
+    <div class="resources-cards">
+      <% if ((recentRequests || []).length === 0) { %>
+        <div class="resources-no-results">
+          <div class="resources-no-results-icon">📦</div>
+          <h3 class="resources-no-results-title">No requests yet</h3>
+          <p class="resources-no-results-text">Be the first to request help</p>
+        </div>
+      <% } else { %>
+        <% recentRequests.forEach(function(r){ %>
+          <div class="resource-card">
+            <div class="resource-card-header">
+              <div class="resource-card-info">
+                <div class="resource-card-icon">🆘</div>
+                <div class="resource-card-details">
+                  <h3><%= (r.item || '').toString() %> <%= r.quantity ? '(x' + r.quantity + ')' : '' %></h3>
+                  <p class="resource-card-donor"><strong><%= r.name %></strong> • <%= r.location %></p>
+                </div>
+              </div>
+              <span class="resource-card-status <%= (r.urgency === 'high' || r.urgency === 'critical') ? 'low' : 'available' %>">
+                <%= r.urgency ? r.urgency.toUpperCase() : 'LOW' %>
+              </span>
+            </div>
+            <div class="resource-card-content">
+              <% if (r.description) { %>
+                <div class="resource-card-item"><span class="resource-card-item-icon">📝</span> <span><%= r.description %></span></div>
+              <% } %>
+              <div class="resource-card-item"><span class="resource-card-item-icon">📍</span> <span><%= r.location %></span></div>
+              <div class="resource-card-item"><span class="resource-card-item-icon">📅</span> <span><%= new Date(r.createdAt).toLocaleString() %></span></div>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+  </section>
+
+<!-- Recent Donations -->
+<section class="section bg-light">
+  <div class="container-wide">
+    <h2 class="page-header-title" style="margin-bottom: 1rem;">Recent Donations</h2>
+    <p class="resources-subtitle" style="margin-bottom: 1.5rem;">Latest support offered by donors</p>
+    <div class="resources-cards">
+      <% if ((recentDonations || []).length === 0) { %>
+        <div class="resources-no-results">
+          <div class="resources-no-results-icon">🎁</div>
+          <h3 class="resources-no-results-title">No donations yet</h3>
+          <p class="resources-no-results-text">Contribute and appear here</p>
+        </div>
+      <% } else { %>
+        <% recentDonations.forEach(function(d){ %>
+          <div class="resource-card">
+            <div class="resource-card-header">
+              <div class="resource-card-info">
+                <div class="resource-card-icon">🎁</div>
+                <div class="resource-card-details">
+                  <h3><%= d.itemType %> (<%= d.quantity %>)</h3>
+                  <p class="resource-card-donor"><strong><%= d.donorName %></strong> • <%= d.location %></p>
+                </div>
+              </div>
+              <span class="resource-card-status available">DONATION</span>
+            </div>
+            <div class="resource-card-content">
+              <% if (d.description) { %>
+                <div class="resource-card-item"><span class="resource-card-item-icon">📝</span> <span><%= d.description %></span></div>
+              <% } %>
+              <div class="resource-card-item"><span class="resource-card-item-icon">📞</span> <span><%= d.contactInfo %></span></div>
+              <div class="resource-card-item"><span class="resource-card-item-icon">📅</span> <span><%= new Date(d.createdAt).toLocaleString() %></span></div>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+</section>
+<!-- Quick Actions -->
+<section class="quick-actions">
+  <div class="container-wide">
+    <h2 class="quick-actions-title">What would you like to do?</h2>
+    <div class="quick-actions-grid">
+      <a href="/resources" class="quick-action-card">
+        <div class="quick-action-icon blue">📦</div>
+        <div class="quick-action-title">Browse Resources</div>
+        <div class="quick-action-description">Find available food, medicine, shelter, and more</div>
+      </a>
+      <a href="/request-help" class="quick-action-card">
+        <div class="quick-action-icon orange">🆘</div>
+        <div class="quick-action-title">Request Emergency Help</div>
+        <div class="quick-action-description">Submit a request and track its status in real-time</div>
+      </a>
+      <a href="/donate" class="quick-action-card">
+        <div class="quick-action-icon green">🎁</div>
+        <div class="quick-action-title">Make a Donation</div>
+        <div class="quick-action-description">Contribute supplies or funds to support relief</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- About / Mission -->
+<section class="about-section">
+  <div class="container-wide">
+    <div class="about-content">
+      <h2 class="about-title">Our Mission</h2>
+      <p class="about-subtitle">We connect people in need with donors and responders to accelerate disaster relief — transparently and efficiently.</p>
+      <div class="about-grid">
+        <div class="about-item">
+          <div class="about-item-icon blue">⚡</div>
+          <div class="about-item-title">Rapid Coordination</div>
+          <div class="about-item-description">Streamlined requests and logistics</div>
+        </div>
+        <div class="about-item">
+          <div class="about-item-icon green">🤝</div>
+          <div class="about-item-title">Community Powered</div>
+          <div class="about-item-description">Volunteers and donors make it happen</div>
+        </div>
+        <div class="about-item">
+          <div class="about-item-icon purple">🔍</div>
+          <div class="about-item-title">Transparent Tracking</div>
+          <div class="about-item-description">Follow every request and donation</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta-section">
+  <div class="container-wide">
+    <h2 class="cta-title">Your support saves lives</h2>
+    <p class="cta-subtitle">Even small actions make a big impact during emergencies.</p>
+    <div class="cta-actions">
+      <a href="/donate" class="cta-btn cta-btn-primary"><span>💚</span> Donate Essentials</a>
+      <a href="/resources" class="cta-btn cta-btn-outline"><span>🔎</span> Explore Resources</a>
+    </div>
+  </div>
+</section>

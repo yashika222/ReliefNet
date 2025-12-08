@@ -1,0 +1,61 @@
+<section class="auth-page">
+  <div class="auth-container">
+    <div class="auth-header">
+      <div class="auth-logo">DR</div>
+      <h2 class="auth-title">Welcome Back</h2>
+      <p class="auth-subtitle">
+        Sign in to your disaster relief account
+      </p>
+    </div>
+    
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="auth-error">
+        <%= error %>
+      </div>
+    <% } %>
+    
+    <form class="auth-form" action="/auth/login" method="POST">
+      <div class="auth-form-grid">
+        <div class="auth-form-group">
+          <label for="email" class="auth-form-label">Email Address</label>
+          <input 
+            id="email" 
+            name="email" 
+            type="email" 
+            required 
+            class="auth-form-input"
+            placeholder="Enter your email"
+          />
+        </div>
+        
+        <div class="auth-form-group">
+          <label for="password" class="auth-form-label">Password</label>
+          <input 
+            id="password" 
+            name="password" 
+            type="password" 
+            required 
+            class="auth-form-input"
+            placeholder="Enter your password"
+          />
+        </div>
+      </div>
+
+      <div>
+        <button type="submit" class="auth-form-button">
+          <svg class="auth-form-button-icon" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+          </svg>
+          Sign In
+        </button>
+      </div>
+
+      <div class="auth-form-link">
+        <p class="auth-form-link-text">
+          Don't have an account? 
+          <a href="/auth/signup">Sign up here</a>
+        </p>
+      </div>
+    </form>
+  </div>
+</section>

@@ -1,0 +1,176 @@
+<!-- Donate Page (Financial Donation) -->
+
+<%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+
+<section class="container" style="max-width: 1100px; margin: 24px auto; padding: 0 16px;">
+  <!-- Disaster banner (shown when visiting from alert email link with disaster info passed by controller) -->
+  <% if (typeof disaster !== 'undefined' && disaster) { %>
+    <div style="background: linear-gradient(135deg,#0ea5e9,#2563eb); color:#fff; padding:20px; border-radius:12px; margin-bottom:16px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="font-size:22px;">🚨</div>
+        <h2 style="margin:0; font-size:20px;">Donate for: <%= disaster.title || 'Disaster Relief' %></h2>
+      </div>
+      <div style="margin-top:8px; display:flex; gap:12px; flex-wrap:wrap; opacity:0.95; font-size:14px;">
+        <span><strong>📍 Location:</strong> <%= disaster.location || 'Unknown' %></span>
+        <span><strong>📊 Type:</strong> <%= disaster.type || 'Unknown' %></span>
+        <span><strong>⚠️ Severity:</strong>
+          <span style="background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:12px; font-weight:600;">
+            <%= disaster.severity || 'Moderate' %>
+          </span>
+        </span>
+      </div>
+      <% if (disaster.description) { %>
+        <p style="margin:12px 0 0; font-size:14px; line-height:1.55; opacity:0.9;"><%= disaster.description %></p>
+      <% } %>
+    </div>
+  <% } %>
+
+  <div style="display:grid; grid-template-columns: 1.2fr .8fr; gap:20px;">
+    <!-- Donation form card -->
+    <div style="background:#fff; border:1px solid #e5e7eb; border-radius:14px; box-shadow:0 10px 24px rgba(15,23,42,0.07);">
+      <div style="padding:20px 20px 0;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:40px; height:40px; border-radius:12px; display:grid; place-items:center; background:#dbeafe; color:#2563eb;">💝</div>
+          <div>
+            <h2 style="margin:0; font-size:20px; font-weight:700;">Make a Donation</h2>
+            <p style="margin:4px 0 0; color:#475569; font-size:14px;">Every rupee helps speed up relief operations.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:20px;">
+        <form id="donateForm">
+          <!-- Hidden disasterId (taken from URL by donate.js, but include here as fallback if server rendered) -->
+          <% if (typeof disaster !== 'undefined' && disaster) { %>
+            <input type="hidden" name="disasterId" value="<%= disaster._id || disaster.disasterId %>" />
+          <% } %>
+
+          <!-- Donor info -->
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+            <div>
+              <label for="donorName" style="font-size:13px; color:#334155; font-weight:600;">Full Name *</label>
+              <input id="donorName" name="donorName" type="text" required
+                     placeholder="Your full name"
+                     style="margin-top:6px; width:100%; padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; font-size:14px;">
+            </div>
+            <div>
+              <label for="email" style="font-size:13px; color:#334155; font-weight:600;">Email *</label>
+              <input id="email" name="email" type="email" required
+                     placeholder="you@example.com"
+                     style="margin-top:6px; width:100%; padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; font-size:14px;">
+            </div>
+          </div>
+
+          <!-- Amount + State -->
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-top:14px;">
+            <div>
+              <label for="amount" style="font-size:13px; color:#334155; font-weight:600;">Amount (₹) *</label>
+              <input id="amount" name="amount" type="number" min="1" step="1" required
+                     placeholder="e.g., 1000"
+                     style="margin-top:6px; width:100%; padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; font-size:14px;">
+            </div>
+            <div>
+              <label for="state" style="font-size:13px; color:#334155; font-weight:600;">Your State *</label>
+              <select id="state" name="state" required
+                      style="margin-top:6px; width:100%; padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; font-size:14px;">
+                <option value="" selected disabled>Select a state</option>
+                <option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option>
+                <option>Bihar</option><option>Chhattisgarh</option><option>Delhi</option>
+                <option>Goa</option><option>Gujarat</option><option>Haryana</option>
+                <option>Himachal Pradesh</option><option>Jammu & Kashmir</option><option>Jharkhand</option>
+                <option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option>
+                <option>Maharashtra</option><option>Manipur</option><option>Meghalaya</option>
+                <option>Mizoram</option><option>Nagaland</option><option>Odisha</option>
+                <option>Punjab</option><option>Rajasthan</option><option>Sikkim</option>
+                <option>Tamil Nadu</option><option>Telangana</option><option>Tripura</option>
+                <option>Uttar Pradesh</option><option>Uttarakhand</option><option>West Bengal</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <div style="margin-top:16px;">
+            <button type="submit"
+                    style="background:#2563eb; color:#fff; border:none; padding:12px 16px; border-radius:10px; font-weight:700; cursor:pointer; width:100%;">
+              <span style="margin-right:6px;">💝</span> Submit Donation
+            </button>
+          </div>
+        </form>
+
+        <!-- Status messages -->
+        <div id="status" style="margin-top:12px;"></div>
+      </div>
+    </div>
+
+    <!-- Tips / Info side card -->
+    <aside style="background:#fff; border:1px solid #e5e7eb; border-radius:14px; padding:18px; box-shadow:0 10px 24px rgba(15,23,42,0.07);">
+      <h3 style="margin:0 0 6px; font-size:16px; font-weight:700;">How your donation helps</h3>
+      <p style="margin:0; color:#475569; font-size:14px;">Funds are allocated to verified relief activities for current disasters. You’ll receive updates in your email.</p>
+      <div style="height:1px; background:#e5e7eb; margin:16px 0;"></div>
+      <h4 style="margin:0 0 8px; font-size:14px; font-weight:700;">Quick notes</h4>
+      <ul style="margin:0; padding-left:18px; color:#334155; font-size:14px;">
+        <li>Use your active email for receipts/alerts</li>
+        <li>State helps us analyse regional impact</li>
+        <li>Link from alert auto-selects that disaster</li>
+      </ul>
+    </aside>
+  </div>
+
+  <!-- Tracker -->
+  <div style="margin-top:24px; background:#fff; border:1px solid #e5e7eb; border-radius:14px; padding:18px; box-shadow:0 10px 24px rgba(15,23,42,0.07);">
+    <div style="text-align:center; margin-bottom:14px;">
+      <h2 style="margin:0; font-size:20px; font-weight:800;">Track Your Donation</h2>
+      <p style="margin:6px 0 0; color:#475569;">Enter your Donation ID to view status</p>
+    </div>
+
+    <div style="display:flex; gap:8px; justify-content:center;">
+      <input id="donationTrackId" type="text" placeholder="Enter Donation ID"
+             style="width:420px; max-width:100%; padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; font-size:14px;">
+      <button id="donationTrackBtn"
+              style="background:#0ea5e9; color:#fff; border:none; padding:10px 14px; border-radius:10px; font-weight:700; cursor:pointer;">
+        Track
+      </button>
+    </div>
+    <p id="donationTrackError" style="text-align:center; color:#ef4444; margin:8px 0 0;"></p>
+
+    <!-- Simple 3-step payment tracker (pending -> success/failed) -->
+    <div id="donationTracker" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top:16px;">
+      <div data-step="pending" style="text-align:center; padding:12px; border:1px solid #e5e7eb; border-radius:12px; opacity:.5;">
+        <div style="font-size:18px;">⏳</div>
+        <div style="font-weight:700;">Pending</div>
+        <div style="color:#64748b; font-size:13px;">Waiting for confirmation</div>
+      </div>
+      <div data-step="success" style="text-align:center; padding:12px; border:1px solid #e5e7eb; border-radius:12px; opacity:.5;">
+        <div style="font-size:18px;">✅</div>
+        <div style="font-weight:700;">Success</div>
+        <div style="color:#64748b; font-size:13px;">Payment received</div>
+      </div>
+      <div data-step="failed" style="text-align:center; padding:12px; border:1px solid #e5e7eb; border-radius:12px; opacity:.5;">
+        <div style="font-size:18px;">❌</div>
+        <div style="font-weight:700;">Failed</div>
+        <div style="color:#64748b; font-size:13px;">Payment declined</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Past Donations -->
+  <div style="margin-top:24px; background:#fff; border:1px solid #e5e7eb; border-radius:14px; padding:18px; box-shadow:0 10px 24px rgba(15,23,42,0.07);">
+    <div style="text-align:center; margin-bottom:12px;">
+      <h2 style="margin:0; font-size:20px; font-weight:800;">Your Past Donations</h2>
+      <p style="margin:6px 0 0; color:#475569;">Quick access to recent contributions</p>
+    </div>
+    <div id="pastDonations"></div>
+  </div>
+</section>
+
+<!-- Page styles (scoped) -->
+<style>
+  .alert { border-radius: 10px; padding: 12px 14px; font-size: 14px; margin-top: 10px; }
+  .alert-success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+  .alert-error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+  #donationTracker [data-step].active { border-color: #2563eb; box-shadow: 0 6px 16px rgba(37, 99, 235, .15); opacity: 1 !important; }
+</style>
+
+<!-- Client JS -->
+<script src="/public/js/donate.js" defer></script>

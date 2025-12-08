@@ -1,0 +1,573 @@
+<div class="admin-dashboard">
+  <div class="page-header">
+    <div>
+      <h1>Admin Dashboard</h1>
+      <p class="subtitle">Real-time intelligence for donations, volunteers, and disaster response.</p>
+    </div>
+    <div class="page-meta">
+      <span class="badge">Admin</span>
+      <span class="timestamp" id="dashboardTimestamp"></span>
+    </div>
+  </div>
+
+  <section class="highlight-grid">
+    <article class="stat-card">
+      <div class="stat-header">
+        <span class="stat-label">Donations Today</span>
+        <span class="stat-icon">&#128161;</span>
+      </div>
+      <div class="stat-value">
+        <span class="currency">&#8377;</span>
+        <span data-stat="donations-today-amount">0</span>
+      </div>
+      <div class="stat-meta" data-stat="donations-today-count">0 donations</div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-header">
+        <span class="stat-label">Donations This Week</span>
+        <span class="stat-icon">&#128197;</span>
+      </div>
+      <div class="stat-value">
+        <span class="currency">&#8377;</span>
+        <span data-stat="donations-week-amount">0</span>
+      </div>
+      <div class="stat-meta" data-stat="donations-week-count">0 donations</div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-header">
+        <span class="stat-label">Donations This Month</span>
+        <span class="stat-icon">&#128200;</span>
+      </div>
+      <div class="stat-value">
+        <span class="currency">&#8377;</span>
+        <span data-stat="donations-month-amount">0</span>
+      </div>
+      <div class="stat-meta" data-stat="donations-month-count">0 donations</div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-header">
+        <span class="stat-label">Total Volunteers</span>
+        <span class="stat-icon">&#129309;</span>
+      </div>
+      <div class="stat-value" data-stat="volunteers-total">0</div>
+      <div class="stat-meta">Approved + pending volunteers</div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-header">
+        <span class="stat-label">Active Volunteers</span>
+        <span class="stat-icon">&#128293;</span>
+      </div>
+      <div class="stat-value" data-stat="volunteers-active">0</div>
+      <div class="stat-meta" data-stat="volunteers-tasks">0 tasks completed</div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-header">
+        <span class="stat-label">Active Disasters</span>
+        <span class="stat-icon">&#9888;</span>
+      </div>
+      <div class="stat-value" data-stat="disasters-active">0</div>
+      <div class="stat-meta" data-stat="disasters-closed">0 closed</div>
+    </article>
+  </section>
+
+  <section class="charts-grid">
+    <article class="chart-card">
+      <header>
+        <div>
+          <h2>Donation Trend (30 Days)</h2>
+          <p>Daily funds collected for the last 30 days.</p>
+        </div>
+        <div class="chart-kpis">
+          <div class="kpi">
+            <span class="kpi-label">Total Donation Amount</span>
+            <span class="kpi-value">
+              <span class="currency">&#8377;</span>
+              <span data-stat="donations-total-amount">0</span>
+            </span>
+          </div>
+          <div class="kpi">
+            <span class="kpi-label">Total Donations</span>
+            <span class="kpi-value" data-stat="donations-total-count">0</span>
+          </div>
+        </div>
+      </header>
+      <div class="chart-wrapper">
+        <canvas id="donationTrendChart"></canvas>
+        <p class="empty-state" data-empty="donationTrendChart">No donation trend data available.</p>
+      </div>
+    </article>
+
+    <article class="chart-card">
+      <header>
+        <div>
+          <h2>Monthly Donations (Cumulative)</h2>
+          <p>Rolling total of donations by month.</p>
+        </div>
+      </header>
+      <div class="chart-wrapper">
+        <canvas id="donationCumulativeChart"></canvas>
+        <p class="empty-state" data-empty="donationCumulativeChart">No cumulative donation data available.</p>
+      </div>
+    </article>
+
+    <article class="chart-card">
+      <header>
+        <div>
+          <h2>Disaster-wise Donations</h2>
+          <p>Funding distribution per disaster event.</p>
+        </div>
+      </header>
+      <div class="chart-wrapper">
+        <canvas id="disasterDonationsChart"></canvas>
+        <p class="empty-state" data-empty="disasterDonationsChart">No disaster donation data available.</p>
+      </div>
+    </article>
+
+    <article class="chart-card">
+      <header>
+        <div>
+          <h2>Top Donor States</h2>
+          <p>Regional contribution breakdown.</p>
+        </div>
+      </header>
+      <div class="chart-wrapper">
+        <canvas id="donorStatesChart"></canvas>
+        <p class="empty-state" data-empty="donorStatesChart">No donor state data available.</p>
+      </div>
+    </article>
+
+    <article class="chart-card">
+      <header>
+        <div>
+          <h2>Volunteer Activity Ranking</h2>
+          <p>Most active volunteers by tasks completed.</p>
+        </div>
+      </header>
+      <div class="chart-wrapper">
+        <canvas id="volunteerRankingChart"></canvas>
+        <p class="empty-state" data-empty="volunteerRankingChart">No volunteer activity data available.</p>
+      </div>
+    </article>
+
+    <article class="chart-card">
+      <header>
+        <div>
+          <h2>Severity of Disasters</h2>
+          <p>Active and historical disasters by severity.</p>
+        </div>
+      </header>
+      <div class="chart-wrapper">
+        <canvas id="severityChart"></canvas>
+        <p class="empty-state" data-empty="severityChart">No severity data available.</p>
+      </div>
+    </article>
+  </section>
+
+  <section class="tables-grid">
+    <article class="table-card">
+      <header>
+        <div>
+          <h2>Recent Donations</h2>
+          <p>Latest five contributions across the platform.</p>
+        </div>
+      </header>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Donor Name</th>
+              <th>Amount (&#8377;)</th>
+              <th>Disaster</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody data-table="recent-donations"></tbody>
+        </table>
+        <p class="empty-state" data-empty="recent-donations">No donations have been recorded yet.</p>
+      </div>
+    </article>
+
+    <article class="table-card">
+      <header>
+        <div>
+          <h2>Volunteer Performance</h2>
+          <p>Task completion status for registered volunteers.</p>
+        </div>
+      </header>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Completed Tasks</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody data-table="volunteers"></tbody>
+        </table>
+        <p class="empty-state" data-empty="volunteers">No volunteers found.</p>
+      </div>
+    </article>
+
+    <article class="table-card">
+      <header>
+        <div>
+          <h2>Recent Disaster Alerts</h2>
+          <p>Latest disaster updates from the field.</p>
+        </div>
+      </header>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Severity</th>
+              <th>Created At</th>
+            </tr>
+          </thead>
+          <tbody data-table="disasters"></tbody>
+        </table>
+        <p class="empty-state" data-empty="disasters">No disaster alerts available.</p>
+      </div>
+    </article>
+  </section>
+
+  <div class="page-loading" id="dashboardLoader">
+    <div class="spinner"></div>
+    <p>Loading analytics...</p>
+  </div>
+</div>
+
+<style>
+  :root {
+    --blue-600: #2563eb;
+    --blue-100: #dbeafe;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-400: #94a3b8;
+    --gray-600: #475569;
+    --slate-900: #0f172a;
+    --border-color: rgba(15, 23, 42, 0.08);
+    --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.08);
+    --card-radius: 16px;
+  }
+
+  .admin-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 1.5rem 0 3rem;
+    color: var(--slate-900);
+  }
+
+  .page-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .page-header h1 {
+    margin: 0;
+    font-size: 2.25rem;
+    font-weight: 700;
+  }
+
+  .subtitle {
+    margin: 0.25rem 0 0;
+    color: var(--gray-600);
+    font-size: 1rem;
+  }
+
+  .page-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .badge {
+    background: var(--blue-100);
+    color: var(--blue-600);
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  .timestamp {
+    color: var(--gray-400);
+    font-size: 0.9rem;
+  }
+
+  .highlight-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .stat-card {
+    background: #ffffff;
+    border-radius: var(--card-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(37, 99, 235, 0.12);
+  }
+
+  .stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--gray-400);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .stat-icon {
+    font-size: 1.25rem;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    color: var(--slate-900);
+  }
+
+  .currency {
+    font-size: 1.125rem;
+    color: var(--gray-400);
+  }
+
+  .stat-meta {
+    color: var(--gray-600);
+    font-size: 0.95rem;
+  }
+
+  .charts-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+
+  .chart-card {
+    background: #ffffff;
+    border-radius: var(--card-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .chart-card header h2 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 700;
+  }
+
+  .chart-card header p {
+    margin: 0.35rem 0 0;
+    color: var(--gray-600);
+    font-size: 0.95rem;
+  }
+
+  .chart-kpis {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 0.75rem;
+  }
+
+  .kpi {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.75rem 1rem;
+    background: var(--gray-50);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+  }
+
+  .kpi-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--gray-400);
+    font-weight: 600;
+  }
+
+  .kpi-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--slate-900);
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.25rem;
+  }
+
+  .chart-wrapper {
+    position: relative;
+    min-height: 260px;
+  }
+
+  .chart-wrapper canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .tables-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  }
+
+  .table-card {
+    background: #ffffff;
+    border-radius: var(--card-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .table-card header h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+
+  .table-card header p {
+    margin: 0.35rem 0 0;
+    color: var(--gray-600);
+    font-size: 0.95rem;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 0.95rem;
+  }
+
+  th {
+    color: var(--gray-400);
+    text-transform: uppercase;
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    background: var(--gray-50);
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  .empty-state {
+    display: none;
+    text-align: center;
+    color: var(--gray-400);
+    font-size: 0.95rem;
+    margin-top: 1rem;
+  }
+
+  .empty-state.active {
+    display: block;
+  }
+
+  .status-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  .status-chip.active {
+    background: rgba(34, 197, 94, 0.16);
+    color: #15803d;
+  }
+
+  .status-chip.inactive {
+    background: rgba(148, 163, 184, 0.2);
+    color: #475569;
+  }
+
+  .page-loading {
+    position: fixed;
+    inset: 0;
+    background: rgba(248, 250, 252, 0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.75rem;
+    z-index: 50;
+  }
+
+  .page-loading.active {
+    display: flex;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 4px solid var(--blue-100);
+    border-top-color: var(--blue-600);
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 768px) {
+    .page-header h1 {
+      font-size: 1.75rem;
+    }
+
+    .stat-card {
+      padding: 1.25rem;
+    }
+
+    .stat-value {
+      font-size: 1.65rem;
+    }
+  }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+<script src="/public/js/admin-dashboard.js" defer></script>
+

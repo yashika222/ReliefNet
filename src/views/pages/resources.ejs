@@ -1,0 +1,123 @@
+<!-- Header Section -->
+<section class="page-header">
+  <div class="container-wide">
+    <div class="text-center">
+      <h1 class="page-header-title">Available Resources</h1>
+      <p class="page-header-subtitle">
+        Find and access relief items and supplies in your area
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Search and Filter Section (Admin only) -->
+<% if (user && user.role === 'admin') { %>
+<section class="resources-filters">
+  <div class="resources-filters-container">
+    <div class="resources-filters-grid">
+      <!-- Search Bar -->
+      <div class="resources-search">
+        <input 
+          type="text" 
+          id="searchInput"
+          placeholder="Search resources (e.g., food, medicine, shelter)..." 
+          class="resources-search-input"
+        />
+        <svg class="resources-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+      
+      <!-- Filter Dropdowns -->
+      <div class="resources-filters-row">
+        <select id="typeFilter" class="resources-filter-select">
+          <option value="">All Types</option>
+          <option value="food">🍞 Food</option>
+          <option value="medicine">💊 Medicine</option>
+          <option value="shelter">🏠 Shelter</option>
+          <option value="clothes">👕 Clothes</option>
+          <option value="other">🛠️ Other</option>
+        </select>
+        
+        <select id="statusFilter" class="resources-filter-select">
+          <option value="">All Status</option>
+          <option value="available">✅ Available</option>
+          <option value="low">⚠️ Low Stock</option>
+          <option value="out">❌ Out of Stock</option>
+        </select>
+        
+        <button id="mapToggle" class="resources-map-btn">
+          📍 Map View
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- Admin Summary + Resources Grid (Admin only) -->
+<% if (user && user.role === 'admin') { %>
+<section class="resources-grid">
+  <div class="resources-grid-container">
+    <!-- Admin Summary Cards -->
+    <div id="adminResourceSummary" class="resources-admin-summary" style="margin-bottom: 24px;"></div>
+
+    <div id="resources" class="resources-cards">
+      <!-- Loading State -->
+      <div class="resources-loading">
+        <div class="resources-loading-spinner"></div>
+        <p class="resources-loading-text">Loading resources...</p>
+      </div>
+    </div>
+    
+    <!-- No Results State -->
+    <div id="noResults" class="resources-no-results hidden">
+      <div class="resources-no-results-icon">📦</div>
+      <h3 class="resources-no-results-title">No resources found</h3>
+      <p class="resources-no-results-text">Try adjusting your search or filters</p>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- Add Resource Section -->
+<section class="resources-add">
+  <div class="resources-filters-container">
+    <div class="resources-filters-grid">
+      <h2 class="page-header-title">Add a Resource</h2>
+      <form id="addResourceForm" class="request-help-form-grid">
+        <div class="request-help-form-grid-2">
+          <div class="request-help-form-group">
+            <label for="resType" class="request-help-form-label">Type *</label>
+            <select id="resType" name="type" required class="request-help-form-input">
+              <option value="">Select type</option>
+              <option value="food">Food</option>
+              <option value="medicine">Medicine</option>
+              <option value="shelter">Shelter</option>
+              <option value="clothes">Clothes</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="request-help-form-group">
+            <label for="resQty" class="request-help-form-label">Quantity *</label>
+            <input id="resQty" name="quantity" type="number" min="0" required class="request-help-form-input" placeholder="e.g., 50" />
+          </div>
+        </div>
+        <div>
+          <label for="resLocation" class="request-help-form-label">Location *</label>
+          <input id="resLocation" name="location" type="text" required class="request-help-form-input" placeholder="Enter location" />
+        </div>
+        <div>
+          <label for="resDescription" class="request-help-form-label">Description</label>
+          <textarea id="resDescription" name="description" rows="3" class="request-help-form-input" placeholder="Optional details"></textarea>
+        </div>
+        <div class="text-center">
+          <button type="submit" class="request-help-form-button">Add Resource</button>
+        </div>
+      </form>
+      <div id="addResStatus" class="mt-4 text-center"></div>
+    </div>
+  </div>
+</section>
+
+<script src="/public/js/resources.js"></script>

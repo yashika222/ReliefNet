@@ -1,0 +1,36 @@
+<main class="container-fluid py-4">
+  <h1 class="mb-4">Manage Users</h1>
+
+  <div class="card shadow-sm">
+    <div class="card-body table-responsive">
+      <table class="table table-striped align-middle" id="usersTable">
+        <thead class="table-light">
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Approved</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.forEach(u => { %>
+            <tr>
+              <td><%= u.name %></td>
+              <td><%= u.email %></td>
+              <td><%= u.role %></td>
+              <td><%= u.approved ? "✅ Yes" : "❌ No" %></td>
+              <td>
+                <% if (!u.approved) { %>
+                  <button class="btn btn-primary btn-sm approve-btn" data-id="<%= u._id %>">Approve</button>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script src="/public/js/admin/manage-users.js"></script>

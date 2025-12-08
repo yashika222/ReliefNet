@@ -1,0 +1,106 @@
+<div class="container mx-auto px-4 py-6">
+	<h1 class="text-2xl font-bold mb-4">Admin Dashboard</h1>
+
+	<!-- Summary Cards -->
+	<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="p-4 bg-white shadow rounded">
+        <p class="text-sm text-gray-500">Donations Today</p>
+        <p id="statToday" class="text-2xl font-semibold">--</p>
+    </div>
+    <div class="p-4 bg-white shadow rounded">
+        <p class="text-sm text-gray-500">This Week</p>
+        <p id="statWeek" class="text-2xl font-semibold">--</p>
+    </div>
+    <div class="p-4 bg-white shadow rounded">
+        <p class="text-sm text-gray-500">This Month</p>
+        <p id="statMonth" class="text-2xl font-semibold">--</p>
+    </div>
+	</div>
+
+	<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+		<div class="p-4 bg-white shadow rounded">
+			<p class="text-sm text-gray-500">Total Volunteers</p>
+			<p id="statVolunteers" class="text-2xl font-semibold">--</p>
+		</div>
+		<div class="p-4 bg-white shadow rounded">
+			<p class="text-sm text-gray-500">Pending Tasks</p>
+			<p id="statTasksPending" class="text-2xl font-semibold">--</p>
+		</div>
+		<div class="p-4 bg-white shadow rounded">
+			<p class="text-sm text-gray-500">Completed Tasks</p>
+			<p id="statTasksCompleted" class="text-2xl font-semibold">--</p>
+		</div>
+		<div class="p-4 bg-white shadow rounded">
+			<p class="text-sm text-gray-500">Total Tasks</p>
+			<p id="statTasksTotal" class="text-2xl font-semibold">--</p>
+		</div>
+	</div>
+
+	<!-- Charts -->
+	<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="p-4 bg-white shadow rounded">
+            <h2 class="font-semibold mb-2">Donation Trend</h2>
+            <canvas id="donationTrendChart" height="120"></canvas>
+        </div>
+        <div class="p-4 bg-white shadow rounded">
+            <h2 class="font-semibold mb-2">Disaster-wise Donations</h2>
+            <canvas id="disasterDonationsChart" height="120"></canvas>
+        </div>
+        <div class="p-4 bg-white shadow rounded">
+            <h2 class="font-semibold mb-2">Top Donor States</h2>
+            <canvas id="topDonorStatesChart" height="120"></canvas>
+        </div>
+        <div class="p-4 bg-white shadow rounded">
+            <h2 class="font-semibold mb-2">Volunteer Activity Ranking</h2>
+            <canvas id="volunteerActivityChart" height="120"></canvas>
+        </div>
+	</div>
+
+	<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+		<div class="p-4 bg-white shadow rounded">
+			<h2 class="font-semibold mb-2">Recent Donations</h2>
+			<table class="w-full text-sm" id="recentDonationsTable">
+				<thead>
+					<tr class="text-left">
+						<th class="py-2">Donor</th>
+						<th class="py-2">Amount</th>
+						<th class="py-2">State</th>
+						<th class="py-2">Disaster</th>
+						<th class="py-2">Date</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div>
+		<div class="p-4 bg-white shadow rounded">
+			<h2 class="font-semibold mb-2">Volunteers</h2>
+			<p class="text-sm text-gray-500">Go to Assign Tasks to manage volunteers.</p>
+			<a href="/admin/tasks" class="inline-block mt-2 px-3 py-2 bg-blue-600 text-white rounded">Assign Tasks</a>
+		</div>
+	</div>
+
+	<!-- Tables & Quick Actions -->
+	<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+		<div class="p-4 bg-white shadow rounded">
+			<h2 class="font-semibold mb-2">Quick Actions</h2>
+			<div class="flex flex-wrap gap-2">
+				<a href="/disasters" class="px-3 py-2 bg-blue-600 text-white rounded">Add New Disaster</a>
+				<a href="/admin/approvals" class="px-3 py-2 bg-green-600 text-white rounded">Approve NGO</a>
+				<a href="/admin/tasks/new" class="px-3 py-2 bg-purple-600 text-white rounded">Assign Volunteer Task</a>
+				<a href="/api/admin/reports/donations.csv" class="px-3 py-2 bg-gray-700 text-white rounded">Generate Reports (CSV)</a>
+			</div>
+		</div>
+		<div class="p-4 bg-white shadow rounded">
+			<h2 class="font-semibold mb-2">System Status</h2>
+			<ul class="list-disc ml-5 text-sm text-gray-700">
+				<li>Active Disasters: <strong><%= cards.activeDisasters %></strong></li>
+				<li>Pending NGO Approvals: <strong><%= cards.pendingNGOs %></strong></li>
+				<li>Active Volunteers: <strong><%= cards.activeVolunteers %></strong></li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+<!-- Chart.js and Admin Dashboard JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/public/js/admin-dashboard.js"></script>

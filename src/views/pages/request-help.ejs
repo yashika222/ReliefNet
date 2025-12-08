@@ -1,0 +1,259 @@
+<!-- Header Section -->
+<section class="request-help-header">
+  <div class="container-wide">
+    <div class="text-center">
+      <h1 class="request-help-title">Request Emergency Help</h1>
+      <p class="request-help-subtitle">
+        We're here to help. Submit your request and our team will assist you as quickly as possible.
+      </p>
+    </div>
+  </div>
+  </section>
+
+<!-- Request Form Section -->
+<section class="request-help-form">
+  <div class="request-help-form-container">
+    <div class="request-help-form-card">
+      <div class="request-help-form-header">
+        <div class="request-help-form-icon">
+          <span>🆘</span>
+        </div>
+        <h2 class="request-help-form-title">Help Request Form</h2>
+        <p class="request-help-form-description">Please fill out the form below with as much detail as possible</p>
+      </div>
+
+      <form id="helpForm" class="request-help-form-grid">
+        <!-- Personal Information -->
+        <div class="request-help-form-grid-2">
+          <div class="request-help-form-group">
+            <label for="name" class="request-help-form-label">
+              Full Name *
+            </label>
+            <input 
+              id="name" 
+              name="name" 
+              type="text" 
+              required 
+              class="request-help-form-input"
+              placeholder="Enter your full name"
+            />
+          </div>
+          
+          <div class="request-help-form-group">
+            <label for="contact" class="request-help-form-label">
+              Contact Number *
+            </label>
+            <input 
+              id="contact" 
+              name="contact" 
+              type="tel" 
+              required 
+              class="request-help-form-input"
+              placeholder="Your phone number"
+            />
+          </div>
+        </div>
+
+        <!-- Location Information -->
+        <div class="request-help-form-group">
+          <label for="location" class="request-help-form-label">
+            Location/Address *
+          </label>
+          <input 
+            id="location" 
+            name="location" 
+            type="text" 
+            required 
+            class="request-help-form-input"
+            placeholder="Enter your current location or address"
+          />
+          <p class="request-help-form-help">Be as specific as possible to help us locate you</p>
+        </div>
+
+        <!-- Help Type and Urgency -->
+        <div class="request-help-form-grid-2">
+          <div class="request-help-form-group">
+            <label for="helpType" class="request-help-form-label">
+              Type of Help Needed *
+            </label>
+            <select 
+              id="helpType" 
+              name="helpType" 
+              required 
+              class="request-help-form-select"
+            >
+              <option value="">Select help type</option>
+              <option value="food">🍞 Food & Water</option>
+              <option value="medicine">💊 Medical Aid</option>
+              <option value="shelter">🏠 Shelter & Housing</option>
+              <option value="clothes">👕 Clothing & Blankets</option>
+              <option value="rescue">🚁 Rescue & Evacuation</option>
+              <option value="transport">🚗 Transportation</option>
+              <option value="other">📝 Other</option>
+            </select>
+          </div>
+          
+          <div class="request-help-form-group">
+            <label for="urgency" class="request-help-form-label">
+              Urgency Level *
+            </label>
+            <select 
+              id="urgency" 
+              name="urgency" 
+              required 
+              class="request-help-form-select"
+            >
+              <option value="">Select urgency</option>
+              <option value="normal">🟢 Normal - Can wait a few hours</option>
+              <option value="high">🟡 High - Need help within 1-2 hours</option>
+              <option value="critical">🔴 Critical - Immediate assistance needed</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Quantity and Details -->
+        <div class="request-help-form-grid-2">
+          <div class="request-help-form-group">
+            <label for="quantity" class="request-help-form-label">
+              Quantity/Number of People
+            </label>
+            <input 
+              id="quantity" 
+              name="quantity" 
+              type="number" 
+              min="1" 
+              class="request-help-form-input"
+              placeholder="How many people need help?"
+            />
+          </div>
+          
+          <div class="request-help-form-group">
+            <label for="alternativeContact" class="request-help-form-label">
+              Alternative Contact (Optional)
+            </label>
+            <input 
+              id="alternativeContact" 
+              name="alternativeContact" 
+              type="tel" 
+              class="request-help-form-input"
+              placeholder="Backup contact number"
+            />
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="request-help-form-group">
+          <label for="description" class="request-help-form-label">
+            Additional Details *
+          </label>
+          <textarea 
+            id="description" 
+            name="description" 
+            rows="4" 
+            required 
+            class="request-help-form-textarea"
+            placeholder="Please provide more details about your situation, specific needs, or any other relevant information..."
+          ></textarea>
+        </div>
+
+        <!-- Photo Upload -->
+        <div class="request-help-form-group">
+          <label for="photo" class="request-help-form-label">
+            Upload Photo (Optional)
+          </label>
+          <label for="photo" class="request-help-form-upload">
+            <div class="request-help-form-upload-content">
+              <svg class="request-help-form-upload-icon" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <div class="request-help-form-upload-text">
+                <span>Drop a file here or</span>
+                <span class="request-help-form-upload-link">browse</span>
+              </div>
+              <p class="request-help-form-upload-info">PNG, JPG, GIF up to 10MB</p>
+            </div>
+            <input id="photo" name="photo" type="file" class="request-help-form-upload-input" accept="image/*" />
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center">
+            <button 
+              type="submit" 
+              class="request-help-form-button"
+            >
+            <span class="mr-2">🚨</span>
+            Submit Help Request
+          </button>
+        </div>
+      </form>
+
+      <!-- Status Messages -->
+      <div id="status" class="mt-6 text-center"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Status Tracker Section -->
+<section class="request-help-status-tracker">
+  <div class="request-help-status-tracker-container">
+    <div class="text-center mb-12">
+      <h2 class="request-help-status-tracker-title">Track Your Request</h2>
+      <p class="request-help-status-tracker-subtitle">
+        After submitting your request, you can track its status here
+      </p>
+      <div class="mt-6 flex items-center justify-center gap-3">
+        <input id="trackIdInput" type="text" class="request-help-form-input" placeholder="Enter your Request ID to track" style="max-width: 420px;" />
+        <button id="trackBtn" class="request-help-form-button" type="button">Track</button>
+      </div>
+      <p id="trackError" class="mt-2 text-sm text-red-600"></p>
+    </div>
+    
+    <div class="request-help-status-tracker-grid" id="statusTracker">
+      <div class="request-help-status-item" data-step="pending">
+        <div class="request-help-status-icon blue">
+          <span>⏳</span>
+        </div>
+        <h3 class="request-help-status-title">Pending</h3>
+        <p class="request-help-status-description">Request received</p>
+      </div>
+      
+      <div class="request-help-status-item" data-step="approved">
+        <div class="request-help-status-icon yellow">
+          <span>✅</span>
+        </div>
+        <h3 class="request-help-status-title">Approved</h3>
+        <p class="request-help-status-description">Request approved</p>
+      </div>
+      
+      <div class="request-help-status-item" data-step="in_progress">
+        <div class="request-help-status-icon orange">
+          <span>🚚</span>
+        </div>
+        <h3 class="request-help-status-title">In Progress</h3>
+        <p class="request-help-status-description">Help is on the way</p>
+      </div>
+      
+      <div class="request-help-status-item" data-step="completed">
+        <div class="request-help-status-icon green">
+          <span>✔️</span>
+        </div>
+        <h3 class="request-help-status-title">Completed</h3>
+        <p class="request-help-status-description">Request fulfilled</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Past Requests Section -->
+<section class="request-help-past-requests">
+  <div class="request-help-form-container">
+    <div class="text-center mb-8">
+      <h2 class="request-help-status-tracker-title">Your Past Requests</h2>
+      <p class="request-help-status-tracker-subtitle">Review all requests you have submitted</p>
+    </div>
+    <div id="pastRequests" class="space-y-4"></div>
+  </div>
+  </section>
+
+<script src="/public/js/request-help.js"></script>

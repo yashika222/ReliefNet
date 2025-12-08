@@ -1,0 +1,11 @@
+<%- include('../layouts/admin-layout', { title: "Admin Dashboard" }) %>
+
+<div class="container py-4">
+  <h1 class="mb-4">Admin Dashboard</h1>
+  <p>Welcome, Admin! This page will show overall statistics of volunteers, NGOs, and tasks.</p>
+  <div class="row">
+    <div class="col-md-4"><div class="card p-3">Total Volunteers: <%= stats.totalVolunteers || 0 %></div></div>
+    <div class="col-md-4"><div class="card p-3">Total NGOs: <%= stats.totalNGOs || 0 %></div></div>
+    <div class="col-md-4"><div class="card p-3">Active Disasters: <%= stats.activeDisasters || 0 %></div></div>
+  </div>
+</div>
