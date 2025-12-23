@@ -104,6 +104,12 @@ app.use(requestLogger);
 // Health route
 app.get('/health', (req, res) => res.json({ ok: true }));
 
+// ✅ Railway safe root route
+app.get('/', (req, res) => {
+  res.status(200).send('ReliefNet backend running 🚀');
+});
+
+
 // ✅ Routes
 app.use('/', indexRoutes);
 app.use('/', testRoutes);
@@ -124,16 +130,18 @@ app.use('/disasters', disasterRoutes);
 
 // 404
 app.use((req, res) => {
-  return res.status(404).render('pages/404', { title: 'Not Found' });
+  res.status(404).json({ message: 'Route not found' });
 });
+
 
 // Error handler
 app.use((err, req, res, next) => {
   logger.error('Unhandled error', { error: err.message, stack: err.stack });
-  if (req.accepts('html')) {
-    return res.status(500).render('pages/500', { title: 'Server Error' });
-  }
-  res.status(500).json({ message: 'Internal Server Error' });
+ res.status(500).json({
+  message: 'Internal Server Error',
+  error: err.message
+});
+  
 });
 
 module.exports = app;
