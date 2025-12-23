@@ -16,16 +16,17 @@
         <% if (user.role === 'admin') { %>
           <a class="navbar-link" href="/admin/dashboard">Dashboard</a>
           <a class="navbar-link" href="/admin/manage-volunteers">Manage Users</a>
+          <a class="navbar-link" href="/admin/volunteer-reports">Volunteer Reports</a>
           <a class="navbar-link" href="/admin/approvals">Approve NGOs</a>
         <% } %>
         <% if (user.role === 'ngo') { %>
           <a class="navbar-link" href="/ngo/dashboard">My Campaigns</a>
-          <a class="navbar-link" href="/ngo/dashboard">Create Campaign</a>
-          <a class="navbar-link" href="/ngo/dashboard">Upload Proof</a>
+          <a class="navbar-link" href="/ngo/campaigns/old">Old Campaigns</a>
+          <a class="navbar-link" href="/ngo/upload-proof">Upload Proof</a>
         <% } %>
         <% if (user.role === 'volunteer') { %>
-          <a class="navbar-link" href="/volunteer/tasks">Tasks</a>
-          <a class="navbar-link" href="/volunteer/tasks">Completed Work</a>
+          <a class="navbar-link" href="/volunteer/dashboard">Tasks</a>
+          <a class="navbar-link" href="/volunteer/tasks/completed">Completed Tasks</a>
         <% } %>
         <% if (user.role === 'donor') { %>
           <a class="navbar-link" href="/donate">Donate</a>
@@ -75,16 +76,17 @@
         <% if (user.role === 'admin') { %>
           <a class="navbar-mobile-link" href="/admin/dashboard">Dashboard</a>
           <a class="navbar-mobile-link" href="/admin/manage-volunteers">Manage Users</a>
+          <a class="navbar-mobile-link" href="/admin/volunteer-reports">Volunteer Reports</a>
           <a class="navbar-mobile-link" href="/admin/approvals">Approve NGOs</a>
         <% } %>
         <% if (user.role === 'ngo') { %>
           <a class="navbar-mobile-link" href="/ngo/dashboard">My Campaigns</a>
-          <a class="navbar-mobile-link" href="/ngo/dashboard">Create Campaign</a>
-          <a class="navbar-mobile-link" href="/ngo/dashboard">Upload Proof</a>
+          <a class="navbar-mobile-link" href="/ngo/campaigns/old">Old Campaigns</a>
+          <a class="navbar-mobile-link" href="/ngo/upload-proof">Upload Proof</a>
         <% } %>
         <% if (user.role === 'volunteer') { %>
-          <a class="navbar-mobile-link" href="/volunteer/tasks">Tasks</a>
-          <a class="navbar-mobile-link" href="/volunteer/tasks">Completed Work</a>
+          <a class="navbar-mobile-link" href="/volunteer/dashboard">Tasks</a>
+          <a class="navbar-mobile-link" href="/volunteer/tasks/completed">Completed Tasks</a>
         <% } %>
         <% if (user.role === 'donor') { %>
           <a class="navbar-mobile-link" href="/donate">Donate</a>

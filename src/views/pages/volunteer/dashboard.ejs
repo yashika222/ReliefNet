@@ -1,196 +1,758 @@
-<main class="container py-5">
-  <div class="row g-4 mb-4">
-    <div class="col-lg-7">
-      <div class="card border-0 shadow-sm h-100">
-        <div class="card-body">
-          <p class="text-uppercase text-muted small mb-1">Welcome back</p>
-          <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between">
-            <div>
-              <h1 class="h3 mb-1"><%= volunteer?.name || user?.name || 'Volunteer' %></h1>
-              <p class="text-muted mb-0">Status:
-                <% if (volunteer?.approvalStatus === 'approved') { %>
-                  <span class="badge bg-success-subtle text-success-emphasis">Approved</span>
-                <% } else if (volunteer?.approvalStatus === 'rejected') { %>
-                  <span class="badge bg-danger-subtle text-danger-emphasis">Rejected</span>
-                <% } else { %>
-                  <span class="badge bg-warning-subtle text-warning-emphasis text-dark">Pending Review</span>
-                <% } %>
-                <% if (volunteer?.blocked) { %>
-                  <span class="badge bg-danger-subtle text-danger-emphasis">Blocked</span>
-                <% } %>
-              </p>
-            </div>
-            <div class="mt-3 mt-md-0 text-md-end">
-              <p class="text-muted small mb-1">Location</p>
-              <p class="fw-semibold mb-0"><%= volunteer?.volunteerProfile?.currentLocation || 'Not set' %></p>
-            </div>
+<main class="volunteer-dashboard">
+  <!-- Hero Section -->
+  <div class="volunteer-hero">
+    <div class="container">
+      <div class="volunteer-hero-content">
+        <div class="volunteer-hero-main">
+          <div class="volunteer-avatar">
+            <i class="bi bi-person-circle"></i>
           </div>
-          <hr>
-          <div class="row g-3">
-            <div class="col-sm-6 col-lg-3">
-              <div class="stat-card">
-                <p class="text-muted small mb-1">Assigned</p>
-                <h4 class="mb-0"><%= stats.assigned %></h4>
-              </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-              <div class="stat-card">
-                <p class="text-muted small mb-1">In progress</p>
-                <h4 class="mb-0"><%= stats.inProgress %></h4>
-              </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-              <div class="stat-card">
-                <p class="text-muted small mb-1">Completed</p>
-                <h4 class="mb-0 text-success"><%= stats.completed %></h4>
-              </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-              <div class="stat-card">
-                <p class="text-muted small mb-1">Overdue</p>
-                <h4 class="mb-0 text-danger"><%= stats.overdue %></h4>
-              </div>
+          <div class="volunteer-hero-text">
+            <h1 class="volunteer-hero-title">Welcome back, <%= user?.name || 'Volunteer' %>!</h1>
+            <div class="volunteer-hero-meta">
+              <% if (user?.approvalStatus === 'approved') { %>
+                <span class="volunteer-badge volunteer-badge-success">
+                  <i class="bi bi-check-circle-fill"></i> Approved
+                </span>
+              <% } else if (volunteer?.approvalStatus === 'rejected') { %>
+                <span class="volunteer-badge volunteer-badge-danger">
+                  <i class="bi bi-x-circle-fill"></i> Rejected
+                </span>
+              <% } else { %>
+                <span class="volunteer-badge volunteer-badge-warning">
+                  <i class="bi bi-clock-fill"></i> Pending Review
+                </span>
+              <% } %>
+              <% if (volunteer?.blocked) { %>
+                <span class="volunteer-badge volunteer-badge-danger">
+                  <i class="bi bi-lock-fill"></i> Blocked
+                </span>
+              <% } %>
+              <span class="volunteer-location">
+                <i class="bi bi-geo-alt-fill"></i> <%= volunteer?.volunteerProfile?.currentLocation || 'Location not set' %>
+              </span>
             </div>
           </div>
         </div>
+        <a href="/volunteer/tasks/completed" class="volunteer-cta-btn">
+          <i class="bi bi-check-circle"></i>
+          View Completed (<%= stats.completed %>)
+        </a>
       </div>
     </div>
-    <div class="col-lg-5">
-      <div class="card border-0 shadow-sm h-100">
-        <div class="card-body">
-          <h5 class="card-title">Notifications</h5>
-          <ul class="list-unstyled mb-0">
-            <li class="d-flex align-items-start gap-2 mb-2">
-              <i class="bi bi-info-circle text-primary mt-1"></i>
-              <div>
-                <strong>Profile</strong>
-                <p class="mb-0 text-muted small">Keep your skills & availability updated so coordinators can assign the right missions.</p>
-              </div>
-            </li>
-            <li class="d-flex align-items-start gap-2 mb-2">
-              <i class="bi bi-clock-history text-warning mt-1"></i>
-              <div>
-                <strong>Overdue tasks</strong>
-                <p class="mb-0 text-muted small">Complete overdue tasks promptly to avoid automatic warnings.</p>
-              </div>
-            </li>
-          </ul>
+  </div>
+
+  <!-- Alerts -->
+  <% if (alerts?.success) { %>
+    <div class="container mt-4">
+      <div class="alert alert-success alert-dismissible fade show volunteer-alert" role="alert">
+        <i class="bi bi-check-circle-fill"></i> <%= alerts.success %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    </div>
+  <% } %>
+  <% if (alerts?.error) { %>
+    <div class="container mt-4">
+      <div class="alert alert-danger alert-dismissible fade show volunteer-alert" role="alert">
+        <i class="bi bi-exclamation-circle-fill"></i> <%= alerts.error %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Stats Cards -->
+  <div class="container mt-4">
+    <div class="volunteer-stats-grid">
+      <div class="volunteer-stat-card">
+        <div class="volunteer-stat-icon volunteer-stat-icon-primary">
+          <i class="bi bi-clipboard-check"></i>
+        </div>
+        <div class="volunteer-stat-content">
+          <div class="volunteer-stat-value"><%= stats.assigned %></div>
+          <div class="volunteer-stat-label">Total Assigned</div>
+        </div>
+      </div>
+      
+      <div class="volunteer-stat-card">
+        <div class="volunteer-stat-icon volunteer-stat-icon-info">
+          <i class="bi bi-arrow-repeat"></i>
+        </div>
+        <div class="volunteer-stat-content">
+          <div class="volunteer-stat-value"><%= stats.inProgress %></div>
+          <div class="volunteer-stat-label">In Progress</div>
+        </div>
+      </div>
+      
+      <div class="volunteer-stat-card volunteer-stat-card-success">
+        <div class="volunteer-stat-icon volunteer-stat-icon-success">
+          <i class="bi bi-check-circle"></i>
+        </div>
+        <div class="volunteer-stat-content">
+          <div class="volunteer-stat-value"><%= stats.completed %></div>
+          <div class="volunteer-stat-label">Completed</div>
+        </div>
+      </div>
+      
+      <div class="volunteer-stat-card volunteer-stat-card-danger">
+        <div class="volunteer-stat-icon volunteer-stat-icon-danger">
+          <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <div class="volunteer-stat-content">
+          <div class="volunteer-stat-value"><%= stats.overdue %></div>
+          <div class="volunteer-stat-label">Overdue</div>
         </div>
       </div>
     </div>
   </div>
 
-  <% if (alerts?.success) { %>
-    <div class="alert alert-success"><%= alerts.success %></div>
-  <% } %>
-  <% if (alerts?.error) { %>
-    <div class="alert alert-danger"><%= alerts.error %></div>
-  <% } %>
+  <!-- Active Tasks Section -->
+  <div class="container mt-5">
+    <div class="volunteer-section-header">
+      <div>
+        <h2 class="volunteer-section-title">
+          <i class="bi bi-list-task"></i> Active Tasks
+        </h2>
+        <p class="volunteer-section-subtitle">Manage your assigned tasks and track progress</p>
+      </div>
+    </div>
 
-  <section class="card border-0 shadow-sm mb-4">
-    <div class="card-body">
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3">
-        <div>
-          <h2 class="h5 mb-1">Assigned Tasks</h2>
-          <p class="text-muted small mb-0">Update progress, upload reports, and close assignments.</p>
+    <% if (!tasks.length) { %>
+      <div class="volunteer-empty-state">
+        <div class="volunteer-empty-icon">
+          <i class="bi bi-inbox"></i>
+        </div>
+        <h3>No Active Tasks</h3>
+        <p>You don't have any active tasks assigned at the moment. Check back later for new assignments!</p>
+      </div>
+    <% } else { %>
+      <div class="volunteer-tasks-grid">
+        <% tasks.forEach(task => { 
+          const overdue = task.status !== 'completed' && task.deadline && new Date(task.deadline) < new Date();
+          const priorityColors = {
+            critical: 'danger',
+            high: 'warning',
+            medium: 'info',
+            low: 'secondary'
+          };
+          const priorityColor = priorityColors[task.priority] || 'info';
+        %>
+          <div class="volunteer-task-card <%= overdue ? 'volunteer-task-card-overdue' : '' %>">
+            <div class="volunteer-task-header">
+              <div class="volunteer-task-title-section">
+                <h3 class="volunteer-task-title"><%= task.title %></h3>
+                <% if (task.priority) { %>
+                  <span class="volunteer-priority-badge volunteer-priority-<%= priorityColor %>">
+                    <%= task.priority.charAt(0).toUpperCase() + task.priority.slice(1) %>
+                  </span>
+                <% } %>
+              </div>
+              <% if (task.status === 'completed') { %>
+                <span class="volunteer-status-badge volunteer-status-completed">
+                  <i class="bi bi-check-circle-fill"></i> Completed
+                </span>
+              <% } else if (task.status === 'in_progress') { %>
+                <span class="volunteer-status-badge volunteer-status-progress">
+                  <i class="bi bi-arrow-repeat"></i> In Progress
+                </span>
+              <% } else { %>
+                <span class="volunteer-status-badge volunteer-status-assigned <%= overdue ? 'volunteer-status-overdue' : '' %>">
+                  <i class="bi bi-clock-fill"></i> <%= overdue ? 'Overdue' : 'Assigned' %>
+                </span>
+              <% } %>
+            </div>
+
+            <% if (task.description) { %>
+              <p class="volunteer-task-description"><%= task.description %></p>
+            <% } %>
+
+            <div class="volunteer-task-meta">
+              <div class="volunteer-task-meta-item">
+                <i class="bi bi-calendar-event"></i>
+                <span><%= task.deadline ? new Date(task.deadline).toLocaleDateString() : 'No deadline' %></span>
+              </div>
+              <div class="volunteer-task-meta-item">
+                <i class="bi bi-geo-alt"></i>
+                <span><%= task.disaster?.title || 'General mission' %></span>
+              </div>
+            </div>
+
+            <div class="volunteer-task-actions">
+              <% if (task.status === 'assigned') { %>
+                <form action="/volunteer/tasks/<%= task._id %>/status" method="POST" class="d-inline">
+                  <input type="hidden" name="status" value="in_progress">
+                  <button type="submit" class="volunteer-btn volunteer-btn-primary">
+                    <i class="bi bi-play-fill"></i> Accept Task
+                  </button>
+                </form>
+              <% } %>
+              
+              <% if (task.status !== 'completed') { %>
+                <form action="/volunteer/tasks/<%= task._id %>/status" method="POST" class="d-inline">
+                  <input type="hidden" name="status" value="completed">
+                  <button type="submit" class="volunteer-btn volunteer-btn-success">
+                    <i class="bi bi-check-circle"></i> Mark Complete
+                  </button>
+                </form>
+                
+                <button type="button" class="volunteer-btn volunteer-btn-outline" data-bs-toggle="collapse" data-bs-target="#reportForm<%= task._id %>">
+                  <i class="bi bi-file-earmark-text"></i> Submit Report
+                </button>
+              <% } %>
+            </div>
+
+            <!-- Report Form (Collapsible) -->
+            <% if (task.status !== 'completed') { %>
+              <div class="collapse mt-3" id="reportForm<%= task._id %>">
+                <div class="volunteer-report-form">
+                  <form action="/volunteer/tasks/<%= task._id %>/report" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold">Report Description <span class="text-danger">*</span></label>
+                      <textarea name="description" class="form-control" rows="4" placeholder="Describe the work completed, challenges faced, and outcomes achieved..." required></textarea>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold">Attachments</label>
+                      <input type="file" name="attachments" class="form-control" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                      <small class="text-muted">Upload photos or documents (JPG, PNG, PDF - Max 8MB each)</small>
+                    </div>
+                    <button type="submit" class="volunteer-btn volunteer-btn-primary">
+                      <i class="bi bi-upload"></i> Submit Report
+                    </button>
+                  </form>
+                </div>
+              </div>
+            <% } %>
+
+            <% if (task.report?.submittedAt) { %>
+              <div class="volunteer-task-report-submitted">
+                <i class="bi bi-check-circle-fill text-success"></i>
+                <span>Report submitted on <%= new Date(task.report.submittedAt).toLocaleString() %></span>
+              </div>
+            <% } %>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Quick Actions & Info -->
+  <div class="container mt-5 mb-5">
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="volunteer-info-card">
+          <div class="volunteer-info-icon">
+            <i class="bi bi-info-circle-fill"></i>
+          </div>
+          <h4>Profile Tips</h4>
+          <p>Keep your skills and availability updated so coordinators can assign the right missions to you.</p>
         </div>
       </div>
-
-      <div class="table-responsive">
-        <table class="table align-middle">
-          <thead>
-            <tr>
-              <th>Task</th>
-              <th>Status</th>
-              <th>Deadline</th>
-              <th>Disaster</th>
-              <th class="text-end">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% if (!tasks.length) { %>
-              <tr>
-                <td colspan="5" class="text-center text-muted py-4">No tasks assigned yet.</td>
-              </tr>
-            <% } %>
-            <% tasks.forEach(task => { 
-              const overdue = task.status !== 'completed' && task.deadline && new Date(task.deadline) < new Date();
-            %>
-              <tr>
-                <td>
-                  <div class="fw-semibold"><%= task.title %></div>
-                  <% if (task.description) { %>
-                    <div class="text-muted small"><%= task.description %></div>
-                  <% } %>
-                </td>
-                <td>
-                  <% if (task.status === 'completed') { %>
-                    <span class="badge bg-success-subtle text-success-emphasis">Completed</span>
-                  <% } else if (task.status === 'in_progress') { %>
-                    <span class="badge bg-primary-subtle text-primary-emphasis">In progress</span>
-                  <% } else { %>
-                    <span class="badge bg-warning-subtle text-dark"><%= overdue ? 'Overdue' : 'Assigned' %></span>
-                  <% } %>
-                </td>
-                <td><%= task.deadline ? new Date(task.deadline).toLocaleDateString() : '—' %></td>
-                <td><%= task.disaster?.title || 'General mission' %></td>
-                <td class="text-end">
-                  <div class="d-flex flex-wrap gap-1 justify-content-end">
-                    <% if (task.status === 'assigned') { %>
-                      <form action="/volunteer/tasks/<%= task._id %>/status" method="POST">
-                        <input type="hidden" name="status" value="in_progress">
-                        <button class="btn btn-sm btn-outline-primary">Accept</button>
-                      </form>
-                    <% } %>
-                    <% if (task.status !== 'completed') { %>
-                      <form action="/volunteer/tasks/<%= task._id %>/report" method="POST" enctype="multipart/form-data" class="report-form d-none">
-                        <input type="hidden" name="taskId" value="<%= task._id %>">
-                      </form>
-                      <form action="/volunteer/tasks/<%= task._id %>/status" method="POST">
-                        <input type="hidden" name="status" value="completed">
-                        <button class="btn btn-sm btn-success">Mark Complete</button>
-                      </form>
-                    <% } %>
-                  </div>
-                  <details class="mt-2">
-                    <summary class="text-muted small">Submit report</summary>
-                    <form action="/volunteer/tasks/<%= task._id %>/report" method="POST" enctype="multipart/form-data" class="mt-2">
-                      <textarea name="description" class="form-control form-control-sm mb-2" rows="3" placeholder="Describe work completed" required></textarea>
-                      <input type="file" name="attachments" class="form-control form-control-sm mb-2" accept=".jpg,.jpeg,.png,.pdf" multiple>
-                      <button class="btn btn-sm btn-outline-secondary">Upload report</button>
-                    </form>
-                  </details>
-                  <% if (task.report?.submittedAt) { %>
-                    <div class="mt-2 text-muted small">Report submitted <%= new Date(task.report.submittedAt).toLocaleString() %></div>
-                  <% } %>
-                </td>
-              </tr>
-            <% }) %>
-          </tbody>
-        </table>
+      <div class="col-md-6">
+        <div class="volunteer-info-card volunteer-info-card-warning">
+          <div class="volunteer-info-icon">
+            <i class="bi bi-clock-history"></i>
+          </div>
+          <h4>Task Deadlines</h4>
+          <p>Complete overdue tasks promptly to avoid automatic warnings and maintain your volunteer status.</p>
+        </div>
       </div>
     </div>
-  </section>
-
-  <section class="card border-0 shadow-sm">
-    <div class="card-body">
-      <h2 class="h5 mb-3">Activity Timeline</h2>
-      <ul class="timeline list-unstyled mb-0">
-        <% tasks.slice(0, 6).forEach(task => { %>
-          <li class="timeline-item mb-3">
-            <div class="d-flex justify-content-between">
-              <div>
-                <strong><%= task.title %></strong>
-                <p class="text-muted small mb-0">Status: <%= task.status %></p>
-              </div>
-              <small class="text-muted"><%= new Date(task.createdAt).toLocaleDateString() %></small>
-            </div>
-          </li>
-        <% }) %>
-        <% if (!tasks.length) { %>
-          <li class="text-muted">Activity will appear here once tasks are assigned.</li>
-        <% } %>
-      </ul>
-    </div>
-  </section>
+  </div>
 </main>
+
+<style>
+.volunteer-dashboard {
+  background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%);
+  min-height: 100vh;
+  padding-bottom: 3rem;
+}
+
+/* Hero Section */
+.volunteer-hero {
+  background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%);
+  color: white;
+  padding: 3rem 0;
+  margin-bottom: 2rem;
+}
+
+.volunteer-hero-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.volunteer-hero-main {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.volunteer-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  flex-shrink: 0;
+}
+
+.volunteer-hero-text {
+  flex: 1;
+}
+
+.volunteer-hero-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: white;
+}
+
+.volunteer-hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.volunteer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.volunteer-badge-success {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10B981;
+}
+
+.volunteer-badge-danger {
+  background: rgba(239, 68, 68, 0.2);
+  color: #EF4444;
+}
+
+.volunteer-badge-warning {
+  background: rgba(245, 158, 11, 0.2);
+  color: #F59E0B;
+}
+
+.volunteer-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+}
+
+.volunteer-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: white;
+  color: #0EA5E9;
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.volunteer-cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  color: #0284C7;
+}
+
+/* Stats Grid */
+.volunteer-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.volunteer-stat-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.volunteer-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.volunteer-stat-card-success {
+  border-left: 4px solid #10B981;
+}
+
+.volunteer-stat-card-danger {
+  border-left: 4px solid #EF4444;
+}
+
+.volunteer-stat-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.volunteer-stat-icon-primary {
+  background: #DBEAFE;
+  color: #2563EB;
+}
+
+.volunteer-stat-icon-info {
+  background: #E0F2FE;
+  color: #0284C7;
+}
+
+.volunteer-stat-icon-success {
+  background: #D1FAE5;
+  color: #10B981;
+}
+
+.volunteer-stat-icon-danger {
+  background: #FEE2E2;
+  color: #EF4444;
+}
+
+.volunteer-stat-content {
+  flex: 1;
+}
+
+.volunteer-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0F172A;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.volunteer-stat-label {
+  font-size: 0.875rem;
+  color: #64748B;
+  font-weight: 500;
+}
+
+/* Section Header */
+.volunteer-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.volunteer-section-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #0F172A;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.volunteer-section-subtitle {
+  color: #64748B;
+  margin: 0;
+}
+
+/* Tasks Grid */
+.volunteer-tasks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.volunteer-task-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.volunteer-task-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.volunteer-task-card-overdue {
+  border-left: 4px solid #EF4444;
+  background: #FEF2F2;
+}
+
+.volunteer-task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.volunteer-task-title-section {
+  flex: 1;
+}
+
+.volunteer-task-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #0F172A;
+  margin-bottom: 0.5rem;
+}
+
+.volunteer-priority-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.volunteer-priority-danger {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+.volunteer-priority-warning {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+.volunteer-priority-info {
+  background: #DBEAFE;
+  color: #2563EB;
+}
+
+.volunteer-priority-secondary {
+  background: #F1F5F9;
+  color: #64748B;
+}
+
+.volunteer-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.volunteer-status-completed {
+  background: #D1FAE5;
+  color: #059669;
+}
+
+.volunteer-status-progress {
+  background: #DBEAFE;
+  color: #2563EB;
+}
+
+.volunteer-status-assigned {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+.volunteer-status-overdue {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+.volunteer-task-description {
+  color: #64748B;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.volunteer-task-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.volunteer-task-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #64748B;
+  font-size: 0.875rem;
+}
+
+.volunteer-task-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.volunteer-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.volunteer-btn-primary {
+  background: #0EA5E9;
+  color: white;
+}
+
+.volunteer-btn-primary:hover {
+  background: #0284C7;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(14, 165, 233, 0.3);
+}
+
+.volunteer-btn-success {
+  background: #10B981;
+  color: white;
+}
+
+.volunteer-btn-success:hover {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+.volunteer-btn-outline {
+  background: transparent;
+  color: #64748B;
+  border: 1px solid #e2e8f0;
+}
+
+.volunteer-btn-outline:hover {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+}
+
+.volunteer-report-form {
+  background: #F8FAFC;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.volunteer-task-report-submitted {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: #D1FAE5;
+  border-radius: 8px;
+  color: #059669;
+  font-size: 0.875rem;
+}
+
+.volunteer-empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.volunteer-empty-icon {
+  font-size: 4rem;
+  color: #CBD5E1;
+  margin-bottom: 1rem;
+}
+
+.volunteer-empty-state h3 {
+  color: #0F172A;
+  margin-bottom: 0.5rem;
+}
+
+.volunteer-empty-state p {
+  color: #64748B;
+  margin-bottom: 1.5rem;
+}
+
+.volunteer-info-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #0EA5E9;
+}
+
+.volunteer-info-card-warning {
+  border-left-color: #F59E0B;
+}
+
+.volunteer-info-icon {
+  font-size: 2rem;
+  color: #0EA5E9;
+  margin-bottom: 1rem;
+}
+
+.volunteer-info-card-warning .volunteer-info-icon {
+  color: #F59E0B;
+}
+
+.volunteer-info-card h4 {
+  color: #0F172A;
+  margin-bottom: 0.75rem;
+}
+
+.volunteer-info-card p {
+  color: #64748B;
+  margin: 0;
+}
+
+.volunteer-alert {
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 768px) {
+  .volunteer-hero-title {
+    font-size: 1.5rem;
+  }
+  
+  .volunteer-tasks-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .volunteer-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .volunteer-hero-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+</style>

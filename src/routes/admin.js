@@ -179,6 +179,83 @@ router.get('/approvals', requireAuth, ensureRole('admin'), (req, res) => {
   });
 });
 
+// Volunteer Reports page
+router.get('/volunteer-reports', requireAuth, ensureRole('admin'), async (req, res) => {
+  try {
+    const { page = 1, limit = 20, search = '', volunteerId = '', status = '' } = req.query;
+    const pageNumber = Math.max(parseInt(page, 10) || 1, 1);
+    const limitNumber = Math.min(Math.max(parseInt(limit, 10) || 20, 1), 100);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const query = { 'report.submittedAt': { $exists: true, $ne: null } };
+    
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { 'report.description': { $regex: search, $options: 'i' } }
+      ];
+    }
+    
+    if (volunteerId) {
+      query.volunteerId = volunteerId;
+    }
+    
+    if (status) {
+      query.status = status;
+    }
+
+    const [reports, total] = await Promise.all([
+      VolunteerTask.find(query)
+        .populate('volunteerId', 'name email')
+        .populate('disaster', 'title location')
+        .sort({ 'report.submittedAt': -1 })
+        .skip(skip)
+        .limit(limitNumber)
+        .lean(),
+      VolunteerTask.countDocuments(query)
+    ]);
+
+    // Get all volunteers for filter dropdown
+    const volunteers = await User.find({ role: 'volunteer' })
+      .select('name email')
+      .sort({ name: 1 })
+      .lean();
+
+    res.render('admin/volunteer-reports', {
+      title: 'Volunteer Reports',
+      user: req.user,
+      activePage: 'volunteer-reports',
+      layout: 'layouts/admin-layout',
+      reports,
+      volunteers,
+      pagination: {
+        page: pageNumber,
+        limit: limitNumber,
+        total,
+        totalPages: Math.ceil(total / limitNumber)
+      },
+      filters: {
+        search: search || '',
+        volunteerId: volunteerId || '',
+        status: status || ''
+      }
+    });
+  } catch (error) {
+    console.error('Error loading volunteer reports:', error);
+    res.status(500).render('admin/volunteer-reports', {
+      title: 'Volunteer Reports',
+      user: req.user,
+      activePage: 'volunteer-reports',
+      layout: 'layouts/admin-layout',
+      reports: [],
+      volunteers: [],
+      pagination: { page: 1, limit: 20, total: 0, totalPages: 0 },
+      filters: { search: '', volunteerId: '', status: '' },
+      error: 'Failed to load reports'
+    });
+  }
+});
+
 
 // Approve single user (generic)
 router.put('/users/:id/approve', verifyToken, ensureRole('admin'), async (req, res) => {

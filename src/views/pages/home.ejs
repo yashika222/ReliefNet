@@ -57,44 +57,6 @@
   </div>
   </section>
 
-<!-- Recent Donations -->
-<section class="section bg-light">
-  <div class="container-wide">
-    <h2 class="page-header-title" style="margin-bottom: 1rem;">Recent Donations</h2>
-    <p class="resources-subtitle" style="margin-bottom: 1.5rem;">Latest support offered by donors</p>
-    <div class="resources-cards">
-      <% if ((recentDonations || []).length === 0) { %>
-        <div class="resources-no-results">
-          <div class="resources-no-results-icon">🎁</div>
-          <h3 class="resources-no-results-title">No donations yet</h3>
-          <p class="resources-no-results-text">Contribute and appear here</p>
-        </div>
-      <% } else { %>
-        <% recentDonations.forEach(function(d){ %>
-          <div class="resource-card">
-            <div class="resource-card-header">
-              <div class="resource-card-info">
-                <div class="resource-card-icon">🎁</div>
-                <div class="resource-card-details">
-                  <h3><%= d.itemType %> (<%= d.quantity %>)</h3>
-                  <p class="resource-card-donor"><strong><%= d.donorName %></strong> • <%= d.location %></p>
-                </div>
-              </div>
-              <span class="resource-card-status available">DONATION</span>
-            </div>
-            <div class="resource-card-content">
-              <% if (d.description) { %>
-                <div class="resource-card-item"><span class="resource-card-item-icon">📝</span> <span><%= d.description %></span></div>
-              <% } %>
-              <div class="resource-card-item"><span class="resource-card-item-icon">📞</span> <span><%= d.contactInfo %></span></div>
-              <div class="resource-card-item"><span class="resource-card-item-icon">📅</span> <span><%= new Date(d.createdAt).toLocaleString() %></span></div>
-            </div>
-          </div>
-        <% }) %>
-      <% } %>
-    </div>
-  </div>
-</section>
 <!-- Quick Actions -->
 <section class="quick-actions">
   <div class="container-wide">

@@ -132,37 +132,10 @@ router.post(
   }
 );
 
-router.get('/dashboard', requireAuth, requireRoles('volunteer'), async (req, res) => {
-  try {
-    const volunteer = await User.findById(req.user.id).lean();
-    const tasks = await VolunteerTask.find({ volunteerId: req.user.id })
-      .populate('disaster', 'title type location severity')
-      .sort({ createdAt: -1 })
-      .lean();
-
-    const stats = {
-      assigned: tasks.length,
-      inProgress: tasks.filter((t) => t.status === 'in_progress').length,
-      completed: tasks.filter((t) => t.status === 'completed').length,
-      overdue: tasks.filter((t) => t.status !== 'completed' && t.deadline && t.deadline < new Date()).length
-    };
-
-    res.render('pages/volunteer/dashboard', {
-      title: 'Volunteer Dashboard',
-      user: req.user,
-      volunteer,
-      tasks,
-      stats,
-      alerts: {
-        success: req.query.success || null,
-        error: req.query.error || null
-      }
-    });
-  } catch (error) {
-    console.error('Volunteer dashboard error', error);
-    res.status(500).send('Failed to load volunteer dashboard');
-  }
+router.get('/volunteer/tasks', requireAuth, requireRoles('volunteer'), (req, res) => {
+  res.redirect('/volunteer/dashboard');
 });
+
 
 router.post(
   '/tasks/:id/status',
@@ -193,6 +166,10 @@ router.post(
       task.history = task.history || [];
       task.history.push({ status, note: 'Volunteer portal update' });
       await task.save();
+      // Redirect to completed tasks page if task was completed
+      if (status === 'completed') {
+        return res.redirect('/volunteer/tasks/completed?success=Task marked as completed');
+      }
       return res.redirect('/volunteer/dashboard?success=Task updated');
     } catch (error) {
       console.error('Volunteer task status error', error);
@@ -251,6 +228,18 @@ router.post(
       task.history = task.history || [];
       task.history.push({ status: task.status, note: 'Report submitted via portal' });
       await task.save();
+
+      // Send email notification to admin
+      try {
+        const volunteer = await User.findById(req.user.id).lean();
+        const mailer = require('../../services/mailer');
+        if (mailer && mailer.sendVolunteerReportToAdmin) {
+          await mailer.sendVolunteerReportToAdmin(volunteer, task, task.report);
+        }
+      } catch (err) {
+        console.warn('Failed to send report notification to admin:', err.message);
+        // Don't fail the request if email fails
+      }
 
       return res.redirect('/volunteer/dashboard?success=Report submitted');
     } catch (error) {

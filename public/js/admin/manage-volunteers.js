@@ -76,6 +76,7 @@
       taskPriority: document.getElementById('taskPriority'),
       taskDeadline: document.getElementById('taskDeadline'),
       relatedRequest: document.getElementById('relatedRequest'),
+      sendEmailOnAssign: document.getElementById('sendEmailOnAssign'),
       emailSubject: document.getElementById('emailSubject'),
       emailMessage: document.getElementById('emailMessage'),
       profile: {
@@ -111,6 +112,19 @@
     attachEventListeners();
     refreshAll();
     loadDisasters();
+    
+    // Check for volunteer query parameter and open profile modal
+    const urlParams = new URLSearchParams(window.location.search);
+    const volunteerId = urlParams.get('volunteer');
+    if (volunteerId) {
+      // Wait a bit for page to load, then open profile modal
+      setTimeout(() => {
+        openProfileModal(volunteerId);
+        // Clean up URL by removing the query parameter
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, '', newUrl);
+      }, 500);
+    }
 
     function safeModal(id) {
       const el = document.getElementById(id);
@@ -586,19 +600,23 @@
         priority: elements.taskPriority.value,
         deadline: elements.taskDeadline.value,
         disasterId: elements.taskDisasterSelect.value,
-        relatedRequest: elements.relatedRequest.value.trim()
+        relatedRequest: elements.relatedRequest.value.trim(),
+        sendEmail: elements.sendEmailOnAssign?.checked !== false // Default to true if checkbox exists
       };
       if (!payload.title) {
         showAlert('Task title is required.', 'warning');
         return;
       }
       try {
-        await request(`/admin/api/volunteers/${volunteerId}/assign-task`, {
+        const response = await request(`/admin/api/volunteers/${volunteerId}/assign-task`, {
           method: 'POST',
           body: payload
         });
-        showAlert('Task assigned successfully.', 'success');
+        showAlert('Task assigned successfully.' + (payload.sendEmail ? ' Email notification sent to volunteer.' : ''), 'success');
         modals.assignTask?.hide();
+        // Reset form
+        elements.assignTaskForm?.reset();
+        if (elements.sendEmailOnAssign) elements.sendEmailOnAssign.checked = true;
         loadVolunteers(state.page);
       } catch (error) {
         console.error('Assign task error', error);

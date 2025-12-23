@@ -52,7 +52,8 @@ app.use(helmet({
         'https://cdnjs.cloudflare.com',
         'https://maps.googleapis.com',
         'https://maps.gstatic.com',
-        'https://unpkg.com'
+        'https://unpkg.com',
+        'https://checkout.razorpay.com'
       ],
       scriptSrcAttr: ["'none'"],
       styleSrc: [
@@ -66,7 +67,9 @@ app.use(helmet({
         "'self'",
         'https://cdn.jsdelivr.net',
         'https://maps.googleapis.com',
-        'https://maps.gstatic.com'
+        'https://maps.gstatic.com',
+        'https://lumberjack.razorpay.com',
+        'https://lumberjack-cx.razorpay.com'
       ],
       fontSrc: [
         "'self'",
@@ -84,7 +87,7 @@ app.use(helmet({
       mediaSrc: ["'self'"],
       workerSrc: ["'self'", 'blob:'],
       objectSrc: ["'none'"],
-      frameSrc: ["'self'"],
+      frameSrc: ["'self'", "https://api.razorpay.com"],
       upgradeInsecureRequests: []
     }
   }
@@ -112,6 +115,7 @@ app.use('/api/requests', optionalAuth, requestRoutes);
 
 // ✅ FIXED — NO optionalAuth
 app.use('/api/donations', donationRoutes);
+app.use('/api/payment', require('./routes/paymentRoutes'));
 
 app.use('/admin', adminRoutes);
 app.use('/api/volunteers', volunteerRoutes);

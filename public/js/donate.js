@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const donationTracker = document.getElementById("donationTracker");
   const pastDonationsEl = document.getElementById("pastDonations");
 
-  // ✅ Submit Donation Form
+  // ✅ Submit Donation Form with Razorpay
   if (donateForm) {
     donateForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -16,11 +16,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
       submitBtn.disabled = true;
       submitBtn.innerHTML = "⏳ Processing...";
+      statusBox.innerHTML = "";
 
       try {
         const formData = new FormData(donateForm);
 
-        // ✅ Correct payload for donation schema
+        // 1. Prepare Payload
         const payload = {
           donorName: formData.get("donorName"),
           email: formData.get("email"),
@@ -29,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
           disasterId: new URLSearchParams(window.location.search).get("disasterId") || null,
         };
 
-        // ✅ Create Donation
+        // 2. Create Donation Record (Pending)
         const res = await fetch("/api/donations", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -40,46 +41,113 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!res.ok) throw new Error(data.error || "Failed to create donation");
 
         const donationId = data.donationId;
+        const amount = payload.amount;
 
-        // ✅ Mark payment as success (important for dashboard)
-        await fetch(`/api/donations/${donationId}`, {
-          method: "PUT",
+        // 3. Create Razorpay Order
+        const orderRes = await fetch("/api/payment/create-order", {
+          method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ paymentStatus: "success" }),
+          body: JSON.stringify({ amount: amount, donationId: donationId }),
         });
 
-        statusBox.innerHTML = `
-          <div class="alert alert-success">
-            ✅ Donation Successful!  
-            <br>Donation ID: <strong>${donationId}</strong>
-          </div>
-        `;
-
-        // ✅ Save ID in local storage (past donations)
-        const history = JSON.parse(localStorage.getItem("myDonationIds") || "[]");
-        if (!history.includes(donationId)) {
-          history.unshift(donationId);
-          localStorage.setItem("myDonationIds", JSON.stringify(history));
+        const orderData = await orderRes.json();
+        if (!orderData.success) {
+          throw new Error(orderData.error || "Failed to initiate payment");
         }
 
-        donationTrackId.value = donationId;
-        await updateDonationTracker(donationId);
+        // 4. Open Razorpay Checkout
+        const options = {
+          key: orderData.key_id,
+          amount: orderData.amount,
+          currency: "INR",
+          name: "Disaster Relief",
+          description: "Donation for Ref: " + donationId,
+          order_id: orderData.order_id,
+          handler: async function (response) {
+            // 5. Verify Payment on Server
+            try {
+              statusBox.innerHTML = "<div class='alert alert-info'>Verifying payment...</div>";
 
-        donateForm.reset();
+              const verifyRes = await fetch("/api/payment/verify", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                  donationId: donationId
+                })
+              });
+
+              const verifyData = await verifyRes.json();
+
+              if (verifyData.success) {
+                statusBox.innerHTML = `
+                  <div class="alert alert-success">
+                    ✅ <strong>Payment Successful!</strong><br>
+                    Thank you for your donation. Receipt sent to your email.<br>
+                    Donation ID: <strong>${donationId}</strong>
+                  </div>
+                `;
+                saveToHistory(donationId);
+                if (donationTrackId) {
+                  donationTrackId.value = donationId;
+                  updateDonationTracker(donationId);
+                }
+                donateForm.reset();
+              } else {
+                throw new Error("Payment verification failed. Please contact support.");
+              }
+            } catch (err) {
+              statusBox.innerHTML = `<div class="alert alert-error">❌ ${err.message}</div>`;
+            }
+          },
+          prefill: {
+            name: payload.donorName,
+            email: payload.email
+          },
+          theme: {
+            color: "#2563eb"
+          },
+          modal: {
+            ondismiss: function () {
+              statusBox.innerHTML = `<div class="alert alert-error">Transaction cancelled by user.</div>`;
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = "💝 Submit Donation";
+            }
+          }
+        };
+
+        const rzp1 = new Razorpay(options);
+        rzp1.on('payment.failed', function (response) {
+          statusBox.innerHTML = `<div class="alert alert-error">❌ Payment Failed: ${response.error.description}</div>`;
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = "💝 Submit Donation";
+        });
+
+        rzp1.open();
+
       } catch (err) {
         statusBox.innerHTML = `
           <div class="alert alert-error">
             ❌ ${err.message}
           </div>
         `;
-      } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = "💝 Submit Donation";
       }
     });
   }
 
-  // ✅ Fetch Donation by ID
+  function saveToHistory(donationId) {
+    const history = JSON.parse(localStorage.getItem("myDonationIds") || "[]");
+    if (!history.includes(donationId)) {
+      history.unshift(donationId);
+      localStorage.setItem("myDonationIds", JSON.stringify(history));
+    }
+  }
+
+  // Same tracking logic as before...
   async function fetchDonationById(id) {
     const res = await fetch(`/api/donations/${id}`);
     if (!res.ok) {
@@ -87,30 +155,25 @@ document.addEventListener("DOMContentLoaded", function () {
       try {
         const errData = await res.json();
         message = errData.error || errData.message || message;
-      } catch (_) {}
+      } catch (_) { }
       throw new Error(message);
     }
     return res.json();
   }
 
-  // ✅ Update donation tracker UI
   async function updateDonationTracker(id) {
     const data = await fetchDonationById(id);
     const status = data.paymentStatus || "pending";
-
     highlightDonationStep(status);
   }
 
-  // ✅ Highlight active step
   function highlightDonationStep(status) {
     if (!donationTracker) return;
-
     const steps = donationTracker.querySelectorAll("[data-step]");
     steps.forEach((s) => {
       s.classList.remove("active");
       s.style.opacity = "0.4";
     });
-
     const activeStep = donationTracker.querySelector(`[data-step="${status}"]`);
     if (activeStep) {
       activeStep.classList.add("active");
@@ -118,17 +181,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // ✅ "Track Donation" button
   if (donationTrackBtn && donationTrackId) {
     donationTrackBtn.addEventListener("click", async () => {
       donationTrackError.textContent = "";
-
       const id = donationTrackId.value.trim();
       if (!id) {
         donationTrackError.textContent = "Please enter a donation ID.";
         return;
       }
-
       try {
         await updateDonationTracker(id);
       } catch (err) {
@@ -137,7 +197,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // ✅ Load Past Donations
   if (pastDonationsEl) {
     loadPastDonations();
   }
@@ -145,37 +204,28 @@ document.addEventListener("DOMContentLoaded", function () {
   async function loadPastDonations() {
     try {
       const ids = JSON.parse(localStorage.getItem("myDonationIds") || "[]");
-
       if (!ids.length) {
-        pastDonationsEl.innerHTML =
-          "<p class='text-gray-600 text-center'>No past donations found.</p>";
+        pastDonationsEl.innerHTML = "<p class='text-gray-600 text-center'>No past donations found.</p>";
         return;
       }
-
       const results = [];
       for (const id of ids) {
         try {
           const d = await fetchDonationById(id);
           results.push(d);
-        } catch (_) {}
+        } catch (_) { }
       }
-
       renderPastDonations(results);
     } catch (err) {
-      pastDonationsEl.innerHTML = `
-        <p class="text-center text-red-500">${err.message}</p>
-      `;
+      pastDonationsEl.innerHTML = `<p class="text-center text-red-500">${err.message}</p>`;
     }
   }
 
-  // ✅ Render Past Donations
   function renderPastDonations(list) {
     if (!list.length) {
-      pastDonationsEl.innerHTML =
-        "<p class='text-gray-600 text-center'>No donations found.</p>";
+      pastDonationsEl.innerHTML = "<p class='text-gray-600 text-center'>No donations found.</p>";
       return;
     }
-
     pastDonationsEl.innerHTML = list
       .map(
         (d) => `
@@ -202,3 +252,4 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+

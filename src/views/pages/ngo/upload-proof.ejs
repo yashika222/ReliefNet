@@ -1,0 +1,680 @@
+<main class="ngo-upload-proof-page">
+  <!-- Header -->
+  <div class="ngo-page-header">
+    <div class="container">
+      <div class="ngo-page-header-content">
+        <div>
+          <h1 class="ngo-page-title">
+            <i class="bi bi-file-earmark-arrow-up-fill"></i> Upload Proof Documents
+          </h1>
+          <p class="ngo-page-subtitle">Upload your NGO registration documents and verification proofs</p>
+        </div>
+        <a href="/ngo/dashboard" class="ngo-back-btn">
+          <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  <% if (alerts?.success) { %>
+    <div class="container mt-4">
+      <div class="alert alert-success alert-dismissible fade show ngo-alert" role="alert">
+        <i class="bi bi-check-circle-fill"></i> <%= alerts.success %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    </div>
+  <% } %>
+  <% if (alerts?.error) { %>
+    <div class="container mt-4">
+      <div class="alert alert-danger alert-dismissible fade show ngo-alert" role="alert">
+        <i class="bi bi-exclamation-circle-fill"></i> <%= alerts.error %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Content -->
+  <div class="container mt-4">
+    <div class="row g-4">
+      <!-- Upload Form -->
+      <div class="col-lg-6">
+        <div class="ngo-card">
+          <div class="ngo-card-header">
+            <h2 class="ngo-card-title">
+              <i class="bi bi-cloud-upload"></i> Upload New Document
+            </h2>
+            <p class="ngo-card-subtitle">Add verification documents to build trust</p>
+          </div>
+          <div class="ngo-card-body">
+            <form id="uploadProofForm" enctype="multipart/form-data" class="ngo-form">
+              <div class="ngo-form-group">
+                <label class="ngo-form-label">Document Name <span class="text-danger">*</span></label>
+                <input type="text" name="documentName" required class="ngo-form-input" 
+                  placeholder="e.g., Registration Certificate, Tax Exemption Proof" />
+              </div>
+              
+              <div class="ngo-form-group">
+                <label class="ngo-form-label">Document Type <span class="text-danger">*</span></label>
+                <select name="documentType" required class="ngo-form-input">
+                  <option value="">Select document type</option>
+                  <option value="registration">Registration Certificate</option>
+                  <option value="tax_exemption">Tax Exemption Proof</option>
+                  <option value="license">License Document</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              
+              <div class="ngo-form-group">
+                <label class="ngo-form-label">Upload File <span class="text-danger">*</span></label>
+                <div class="ngo-file-upload">
+                  <input type="file" name="document" required accept=".pdf,.jpg,.jpeg,.png" 
+                    class="ngo-file-input" id="fileInput" />
+                  <label for="fileInput" class="ngo-file-label">
+                    <i class="bi bi-cloud-upload"></i>
+                    <span>Choose file or drag and drop</span>
+                    <small>PDF, JPG, PNG (Max 5MB)</small>
+                  </label>
+                </div>
+                <div id="fileName" class="ngo-file-name"></div>
+              </div>
+              
+              <div class="ngo-form-group">
+                <label class="ngo-form-label">Description</label>
+                <textarea name="description" rows="4" class="ngo-form-input"
+                  placeholder="Additional information about this document"></textarea>
+              </div>
+              
+              <button type="submit" class="ngo-btn ngo-btn-primary w-100">
+                <i class="bi bi-upload"></i> Upload Document
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Uploaded Documents -->
+      <div class="col-lg-6">
+        <div class="ngo-card">
+          <div class="ngo-card-header">
+            <h2 class="ngo-card-title">
+              <i class="bi bi-folder-check"></i> Uploaded Documents
+            </h2>
+            <p class="ngo-card-subtitle"><%= ngo?.ngoProfile?.documents?.length || 0 %> document<%= (ngo?.ngoProfile?.documents?.length || 0) !== 1 ? 's' : '' %> uploaded</p>
+          </div>
+          <div class="ngo-card-body">
+            <% if (ngo?.ngoProfile?.documents && ngo.ngoProfile.documents.length > 0) { %>
+              <div class="ngo-documents-list">
+                <% ngo.ngoProfile.documents.forEach((doc, index) => { %>
+                  <div class="ngo-document-item">
+                    <div class="ngo-document-icon">
+                      <% if (doc.mimeType === 'application/pdf') { %>
+                        <i class="bi bi-file-earmark-pdf-fill"></i>
+                      <% } else { %>
+                        <i class="bi bi-file-earmark-image-fill"></i>
+                      <% } %>
+                    </div>
+                    <div class="ngo-document-content">
+                      <h4 class="ngo-document-name"><%= doc.name || 'Document ' + (index + 1) %></h4>
+                      <div class="ngo-document-meta">
+                        <span class="ngo-document-type"><%= doc.type || 'Other' %></span>
+                        <% if (doc.uploadedAt) { %>
+                          <span class="ngo-document-date">
+                            <i class="bi bi-calendar"></i>
+                            <%= new Date(doc.uploadedAt).toLocaleDateString() %>
+                          </span>
+                        <% } %>
+                      </div>
+                      <% if (doc.status === 'verified') { %>
+                        <span class="ngo-status-badge ngo-status-approved">
+                          <i class="bi bi-check-circle-fill"></i> Verified
+                        </span>
+                      <% } else if (doc.status === 'rejected') { %>
+                        <span class="ngo-status-badge ngo-status-rejected">
+                          <i class="bi bi-x-circle-fill"></i> Rejected
+                        </span>
+                      <% } else { %>
+                        <span class="ngo-status-badge ngo-status-pending">
+                          <i class="bi bi-clock-fill"></i> Pending Review
+                        </span>
+                      <% } %>
+                    </div>
+                    <div class="ngo-document-actions">
+                      <% if (doc.url) { %>
+                        <a href="<%= doc.url %>" target="_blank" class="ngo-btn-icon" title="View document">
+                          <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="<%= doc.url %>" download class="ngo-btn-icon" title="Download document">
+                          <i class="bi bi-download"></i>
+                        </a>
+                      <% } %>
+                    </div>
+                  </div>
+                <% }) %>
+              </div>
+            <% } else { %>
+              <div class="ngo-empty-state">
+                <i class="bi bi-file-earmark"></i>
+                <h4>No Documents Uploaded</h4>
+                <p>Upload your first document using the form on the left to get started.</p>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Guidelines Card -->
+    <div class="ngo-guidelines-card">
+      <div class="ngo-guidelines-icon">
+        <i class="bi bi-info-circle-fill"></i>
+      </div>
+      <div class="ngo-guidelines-content">
+        <h3>Document Upload Guidelines</h3>
+        <ul class="ngo-guidelines-list">
+          <li>
+            <i class="bi bi-check-circle"></i>
+            Upload clear, readable copies of your documents
+          </li>
+          <li>
+            <i class="bi bi-check-circle"></i>
+            Accepted formats: PDF, JPG, PNG (Maximum file size: 5MB)
+          </li>
+          <li>
+            <i class="bi bi-check-circle"></i>
+            Documents will be reviewed by admin before verification
+          </li>
+          <li>
+            <i class="bi bi-check-circle"></i>
+            You can upload multiple documents for different purposes
+          </li>
+          <li>
+            <i class="bi bi-check-circle"></i>
+            Verified documents help build trust with donors and volunteers
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</main>
+
+<style>
+.ngo-upload-proof-page {
+  background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%);
+  min-height: 100vh;
+  padding-bottom: 3rem;
+}
+
+.ngo-page-header {
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  color: white;
+  padding: 2.5rem 0;
+  margin-bottom: 2rem;
+}
+
+.ngo-page-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.ngo-page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ngo-page-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-size: 1rem;
+}
+
+.ngo-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: white;
+  color: #8B5CF6;
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ngo-back-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  color: #7C3AED;
+}
+
+.ngo-card {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.ngo-card-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.ngo-card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0F172A;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ngo-card-subtitle {
+  color: #64748B;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.ngo-card-body {
+  padding: 1.5rem;
+  flex: 1;
+}
+
+.ngo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.ngo-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ngo-form-label {
+  font-weight: 600;
+  color: #0F172A;
+  font-size: 0.875rem;
+}
+
+.ngo-form-input {
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.ngo-form-input:focus {
+  outline: none;
+  border-color: #8B5CF6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.ngo-file-upload {
+  position: relative;
+}
+
+.ngo-file-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.ngo-file-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  border: 2px dashed #CBD5E1;
+  border-radius: 8px;
+  background: #F8FAFC;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.ngo-file-label:hover {
+  border-color: #8B5CF6;
+  background: #F3F4F6;
+}
+
+.ngo-file-label i {
+  font-size: 2rem;
+  color: #8B5CF6;
+  margin-bottom: 0.5rem;
+}
+
+.ngo-file-label span {
+  font-weight: 600;
+  color: #0F172A;
+  margin-bottom: 0.25rem;
+}
+
+.ngo-file-label small {
+  color: #64748B;
+  font-size: 0.75rem;
+}
+
+.ngo-file-name {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: #E9D5FF;
+  border-radius: 6px;
+  color: #7C3AED;
+  font-size: 0.875rem;
+  display: none;
+}
+
+.ngo-file-name.show {
+  display: block;
+}
+
+.ngo-documents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ngo-document-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: #F8FAFC;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.ngo-document-item:hover {
+  background: #F1F5F9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.ngo-document-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  background: #E9D5FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #8B5CF6;
+  flex-shrink: 0;
+}
+
+.ngo-document-content {
+  flex: 1;
+}
+
+.ngo-document-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0F172A;
+  margin-bottom: 0.5rem;
+}
+
+.ngo-document-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.ngo-document-type {
+  padding: 0.25rem 0.75rem;
+  background: #E2E8F0;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748B;
+  text-transform: capitalize;
+}
+
+.ngo-document-date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #64748B;
+  font-size: 0.875rem;
+}
+
+.ngo-document-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.ngo-btn-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: #64748B;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.ngo-btn-icon:hover {
+  background: #8B5CF6;
+  color: white;
+  border-color: #8B5CF6;
+}
+
+.ngo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.ngo-btn-primary {
+  background: #8B5CF6;
+  color: white;
+}
+
+.ngo-btn-primary:hover {
+  background: #7C3AED;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
+}
+
+.ngo-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ngo-status-approved {
+  background: #D1FAE5;
+  color: #059669;
+}
+
+.ngo-status-rejected {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+.ngo-status-pending {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+.ngo-empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #64748B;
+}
+
+.ngo-empty-state i {
+  font-size: 3rem;
+  color: #CBD5E1;
+  margin-bottom: 1rem;
+}
+
+.ngo-empty-state h4 {
+  color: #0F172A;
+  margin-bottom: 0.5rem;
+}
+
+.ngo-empty-state p {
+  color: #64748B;
+  margin: 0;
+}
+
+.ngo-guidelines-card {
+  background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-top: 2rem;
+  display: flex;
+  gap: 1.5rem;
+  border: 1px solid #93C5FD;
+}
+
+.ngo-guidelines-icon {
+  font-size: 2.5rem;
+  color: #2563EB;
+  flex-shrink: 0;
+}
+
+.ngo-guidelines-content h3 {
+  color: #1E40AF;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.ngo-guidelines-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ngo-guidelines-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  color: #1E40AF;
+  font-size: 0.9rem;
+}
+
+.ngo-guidelines-list li i {
+  color: #2563EB;
+  margin-top: 0.25rem;
+  flex-shrink: 0;
+}
+
+.ngo-alert {
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.w-100 {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .ngo-page-title {
+    font-size: 1.5rem;
+  }
+  
+  .ngo-page-header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .ngo-guidelines-card {
+    flex-direction: column;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('uploadProofForm');
+  const fileInput = document.getElementById('fileInput');
+  const fileName = document.getElementById('fileName');
+  
+  if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        fileName.textContent = 'Selected: ' + e.target.files[0].name;
+        fileName.classList.add('show');
+      } else {
+        fileName.classList.remove('show');
+      }
+    });
+  }
+  
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Uploading...';
+      
+      try {
+        const response = await fetch('/ngo/upload-proof', {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (response.ok) {
+          window.location.href = '/ngo/upload-proof?success=' + encodeURIComponent('Document uploaded successfully. Admin will review it soon.');
+        } else {
+          const result = await response.json();
+          alert('Error: ' + (result.message || 'Failed to upload document'));
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+        }
+      } catch (error) {
+        alert('Error: ' + error.message);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+    });
+  }
+});
+</script>

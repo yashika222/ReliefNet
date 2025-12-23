@@ -1,0 +1,422 @@
+<main class="ngo-old-campaigns-page">
+  <!-- Header -->
+  <div class="ngo-page-header">
+    <div class="container">
+      <div class="ngo-page-header-content">
+        <div>
+          <h1 class="ngo-page-title">
+            <i class="bi bi-archive-fill"></i> Old Campaigns
+          </h1>
+          <p class="ngo-page-subtitle">View your completed, rejected, or ended campaigns</p>
+        </div>
+        <a href="/ngo/dashboard" class="ngo-back-btn">
+          <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="container mt-4">
+    <% if (!campaigns || campaigns.length === 0) { %>
+      <div class="ngo-empty-state">
+        <div class="ngo-empty-icon">
+          <i class="bi bi-archive"></i>
+        </div>
+        <h3>No Old Campaigns</h3>
+        <p>You don't have any completed, rejected, or ended campaigns yet.</p>
+        <a href="/ngo/dashboard" class="ngo-btn ngo-btn-primary mt-3">
+          <i class="bi bi-arrow-left"></i> View Active Campaigns
+        </a>
+      </div>
+    <% } else { %>
+      <!-- Summary -->
+      <div class="ngo-summary-card">
+        <div class="ngo-summary-icon">
+          <i class="bi bi-clock-history"></i>
+        </div>
+        <div class="ngo-summary-content">
+          <h3>Campaign History</h3>
+          <p>You have <strong><%= campaigns.length %></strong> campaign<%= campaigns.length !== 1 ? 's' : '' %> in your archive.</p>
+        </div>
+      </div>
+
+      <!-- Campaigns Grid -->
+      <div class="ngo-old-campaigns-grid">
+        <% campaigns.forEach(campaign => { %>
+          <div class="ngo-old-campaign-card">
+            <div class="ngo-old-campaign-header">
+              <div class="ngo-old-campaign-title-section">
+                <h3 class="ngo-old-campaign-title"><%= campaign.title %></h3>
+                <div class="ngo-old-campaign-dates">
+                  <span class="ngo-date-item">
+                    <i class="bi bi-calendar-plus"></i>
+                    Created: <%= new Date(campaign.createdAt).toLocaleDateString() %>
+                  </span>
+                  <% if (campaign.endDate) { %>
+                    <span class="ngo-date-item">
+                      <i class="bi bi-calendar-x"></i>
+                      Ended: <%= new Date(campaign.endDate).toLocaleDateString() %>
+                    </span>
+                  <% } %>
+                </div>
+              </div>
+              <% if (campaign.status === 'approved') { %>
+                <span class="ngo-status-badge ngo-status-approved">
+                  <i class="bi bi-check-circle-fill"></i> Approved
+                </span>
+              <% } else if (campaign.status === 'rejected') { %>
+                <span class="ngo-status-badge ngo-status-rejected">
+                  <i class="bi bi-x-circle-fill"></i> Rejected
+                </span>
+              <% } else { %>
+                <span class="ngo-status-badge ngo-status-pending">
+                  <i class="bi bi-clock-fill"></i> <%= campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1) %>
+                </span>
+              <% } %>
+            </div>
+
+            <% if (campaign.description) { %>
+              <p class="ngo-old-campaign-description"><%= campaign.description %></p>
+            <% } %>
+
+            <div class="ngo-old-campaign-stats">
+              <div class="ngo-stat-item">
+                <div class="ngo-stat-item-icon">
+                  <i class="bi bi-cash-coin"></i>
+                </div>
+                <div class="ngo-stat-item-content">
+                  <span class="ngo-stat-item-label">Target Amount</span>
+                  <span class="ngo-stat-item-value">₹<%= campaign.targetAmount ? campaign.targetAmount.toLocaleString() : '0' %></span>
+                </div>
+              </div>
+              
+              <div class="ngo-stat-item">
+                <div class="ngo-stat-item-icon">
+                  <i class="bi bi-calendar-event"></i>
+                </div>
+                <div class="ngo-stat-item-content">
+                  <span class="ngo-stat-item-label">Start Date</span>
+                  <span class="ngo-stat-item-value">
+                    <%= campaign.startDate ? new Date(campaign.startDate).toLocaleDateString() : 'Not set' %>
+                  </span>
+                </div>
+              </div>
+              
+              <div class="ngo-stat-item">
+                <div class="ngo-stat-item-icon">
+                  <i class="bi bi-calendar-check"></i>
+                </div>
+                <div class="ngo-stat-item-content">
+                  <span class="ngo-stat-item-label">End Date</span>
+                  <span class="ngo-stat-item-value">
+                    <%= campaign.endDate ? new Date(campaign.endDate).toLocaleDateString() : 'Not set' %>
+                  </span>
+                </div>
+              </div>
+              
+              <div class="ngo-stat-item">
+                <div class="ngo-stat-item-icon">
+                  <i class="bi bi-info-circle"></i>
+                </div>
+                <div class="ngo-stat-item-content">
+                  <span class="ngo-stat-item-label">Status</span>
+                  <span class="ngo-stat-item-value capitalize"><%= campaign.status %></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<style>
+.ngo-old-campaigns-page {
+  background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%);
+  min-height: 100vh;
+  padding-bottom: 3rem;
+}
+
+.ngo-page-header {
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  color: white;
+  padding: 2.5rem 0;
+  margin-bottom: 2rem;
+}
+
+.ngo-page-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.ngo-page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ngo-page-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-size: 1rem;
+}
+
+.ngo-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: white;
+  color: #8B5CF6;
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ngo-back-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  color: #7C3AED;
+}
+
+.ngo-summary-card {
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  color: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 8px 16px rgba(139, 92, 246, 0.2);
+}
+
+.ngo-summary-icon {
+  font-size: 3rem;
+  opacity: 0.9;
+}
+
+.ngo-summary-content h3 {
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.ngo-summary-content p {
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+}
+
+.ngo-old-campaigns-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.ngo-old-campaign-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.ngo-old-campaign-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.ngo-old-campaign-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.ngo-old-campaign-title-section {
+  flex: 1;
+}
+
+.ngo-old-campaign-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #0F172A;
+  margin-bottom: 0.75rem;
+}
+
+.ngo-old-campaign-dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.ngo-date-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #64748B;
+  font-size: 0.875rem;
+}
+
+.ngo-old-campaign-description {
+  color: #64748B;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.ngo-old-campaign-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.ngo-stat-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.ngo-stat-item-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #F8FAFC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8B5CF6;
+  flex-shrink: 0;
+}
+
+.ngo-stat-item-content {
+  flex: 1;
+}
+
+.ngo-stat-item-label {
+  display: block;
+  font-size: 0.75rem;
+  color: #94A3B8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.ngo-stat-item-value {
+  display: block;
+  font-weight: 600;
+  color: #0F172A;
+  font-size: 0.9rem;
+}
+
+.ngo-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ngo-status-approved {
+  background: #D1FAE5;
+  color: #059669;
+}
+
+.ngo-status-rejected {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+.ngo-status-pending {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+.ngo-empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.ngo-empty-icon {
+  font-size: 4rem;
+  color: #8B5CF6;
+  margin-bottom: 1rem;
+}
+
+.ngo-empty-state h3 {
+  color: #0F172A;
+  margin-bottom: 0.5rem;
+}
+
+.ngo-empty-state p {
+  color: #64748B;
+  margin-bottom: 1.5rem;
+}
+
+.ngo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.ngo-btn-primary {
+  background: #8B5CF6;
+  color: white;
+}
+
+.ngo-btn-primary:hover {
+  background: #7C3AED;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+@media (max-width: 768px) {
+  .ngo-page-title {
+    font-size: 1.5rem;
+  }
+  
+  .ngo-old-campaigns-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .ngo-old-campaign-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .ngo-page-header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+</style>

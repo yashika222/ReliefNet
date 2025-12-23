@@ -1,0 +1,592 @@
+<main class="volunteer-completed-page">
+  <!-- Header -->
+  <div class="volunteer-page-header">
+    <div class="container">
+      <div class="volunteer-page-header-content">
+        <div>
+          <h1 class="volunteer-page-title">
+            <i class="bi bi-check-circle-fill"></i> Completed Tasks
+          </h1>
+          <p class="volunteer-page-subtitle">View all tasks you have successfully completed</p>
+        </div>
+        <a href="/volunteer/dashboard" class="volunteer-back-btn">
+          <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  <% if (alerts?.success) { %>
+    <div class="container mt-4">
+      <div class="alert alert-success alert-dismissible fade show volunteer-alert" role="alert">
+        <i class="bi bi-check-circle-fill"></i> <%= alerts.success %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    </div>
+  <% } %>
+  <% if (alerts?.error) { %>
+    <div class="container mt-4">
+      <div class="alert alert-danger alert-dismissible fade show volunteer-alert" role="alert">
+        <i class="bi bi-exclamation-circle-fill"></i> <%= alerts.error %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Content -->
+  <div class="container mt-4">
+    <% if (!tasks.length) { %>
+      <div class="volunteer-empty-state">
+        <div class="volunteer-empty-icon">
+          <i class="bi bi-check-circle"></i>
+        </div>
+        <h3>No Completed Tasks Yet</h3>
+        <p>Complete your assigned tasks to see them here. Your completed work will be displayed with full details and reports.</p>
+        <a href="/volunteer/dashboard" class="volunteer-btn volunteer-btn-primary mt-3">
+          <i class="bi bi-arrow-left"></i> View Active Tasks
+        </a>
+      </div>
+    <% } else { %>
+      <!-- Summary Card -->
+      <div class="volunteer-summary-card">
+        <div class="volunteer-summary-icon">
+          <i class="bi bi-trophy-fill"></i>
+        </div>
+        <div class="volunteer-summary-content">
+          <h3>Great Work!</h3>
+          <p>You have completed <strong><%= tasks.length %></strong> task<%= tasks.length !== 1 ? 's' : '' %> successfully.</p>
+        </div>
+      </div>
+
+      <!-- Tasks Grid -->
+      <div class="volunteer-completed-tasks-grid">
+        <% tasks.forEach(task => { 
+          const priorityColors = {
+            critical: 'danger',
+            high: 'warning',
+            medium: 'info',
+            low: 'secondary'
+          };
+          const priorityColor = priorityColors[task.priority] || 'info';
+        %>
+          <div class="volunteer-completed-task-card">
+            <div class="volunteer-completed-task-header">
+              <div class="volunteer-completed-task-title-section">
+                <h3 class="volunteer-completed-task-title">
+                  <i class="bi bi-check-circle-fill text-success"></i>
+                  <%= task.title %>
+                </h3>
+                <% if (task.priority) { %>
+                  <span class="volunteer-priority-badge volunteer-priority-<%= priorityColor %>">
+                    <%= task.priority.charAt(0).toUpperCase() + task.priority.slice(1) %>
+                  </span>
+                <% } %>
+              </div>
+              <span class="volunteer-status-badge volunteer-status-completed">
+                <i class="bi bi-check-circle-fill"></i> Completed
+              </span>
+            </div>
+
+            <% if (task.description) { %>
+              <p class="volunteer-completed-task-description"><%= task.description %></p>
+            <% } %>
+
+            <div class="volunteer-completed-task-info">
+              <div class="volunteer-info-row">
+                <div class="volunteer-info-item">
+                  <i class="bi bi-calendar-check-fill"></i>
+                  <div>
+                    <span class="volunteer-info-label">Completed</span>
+                    <span class="volunteer-info-value">
+                      <% if (task.completedAt) { %>
+                        <%= new Date(task.completedAt).toLocaleDateString() %> at <%= new Date(task.completedAt).toLocaleTimeString() %>
+                      <% } else { %>
+                        N/A
+                      <% } %>
+                    </span>
+                  </div>
+                </div>
+                <div class="volunteer-info-item">
+                  <i class="bi bi-calendar-event"></i>
+                  <div>
+                    <span class="volunteer-info-label">Deadline</span>
+                    <span class="volunteer-info-value">
+                      <%= task.deadline ? new Date(task.deadline).toLocaleDateString() : 'No deadline' %>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="volunteer-info-row">
+                <div class="volunteer-info-item">
+                  <i class="bi bi-geo-alt-fill"></i>
+                  <div>
+                    <span class="volunteer-info-label">Disaster</span>
+                    <span class="volunteer-info-value"><%= task.disaster?.title || 'General mission' %></span>
+                    <% if (task.disaster?.location) { %>
+                      <span class="volunteer-info-subtext"><%= task.disaster.location %></span>
+                    <% } %>
+                  </div>
+                </div>
+                <div class="volunteer-info-item">
+                  <i class="bi bi-file-earmark-text-fill"></i>
+                  <div>
+                    <span class="volunteer-info-label">Report</span>
+                    <span class="volunteer-info-value">
+                      <% if (task.report?.submittedAt) { %>
+                        <span class="text-success">Submitted</span>
+                      <% } else { %>
+                        <span class="text-muted">No report</span>
+                      <% } %>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <% if (task.report) { %>
+              <div class="volunteer-completed-task-report">
+                <button type="button" class="volunteer-btn volunteer-btn-outline" data-bs-toggle="modal" data-bs-target="#reportModal<%= task._id %>">
+                  <i class="bi bi-eye"></i> View Full Report
+                </button>
+                
+                <!-- Report Modal -->
+                <div class="modal fade" id="reportModal<%= task._id %>" tabindex="-1">
+                  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">
+                          <i class="bi bi-file-earmark-text"></i> Task Report: <%= task.title %>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+                      <div class="modal-body">
+                        <div class="volunteer-report-section">
+                          <h6 class="volunteer-report-section-title">Description</h6>
+                          <p class="volunteer-report-text"><%= task.report.description %></p>
+                        </div>
+                        
+                        <% if (task.report.attachments && task.report.attachments.length > 0) { %>
+                          <div class="volunteer-report-section">
+                            <h6 class="volunteer-report-section-title">Attachments</h6>
+                            <div class="volunteer-attachments-grid">
+                              <% task.report.attachments.forEach(att => { %>
+                                <a href="<%= att.url %>" target="_blank" class="volunteer-attachment-card">
+                                  <i class="bi bi-file-earmark-pdf-fill"></i>
+                                  <span><%= att.originalName %></span>
+                                  <i class="bi bi-download"></i>
+                                </a>
+                              <% }) %>
+                            </div>
+                          </div>
+                        <% } %>
+                        
+                        <div class="volunteer-report-meta">
+                          <i class="bi bi-clock"></i>
+                          Submitted on <%= new Date(task.report.submittedAt).toLocaleString() %>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="volunteer-btn volunteer-btn-outline" data-bs-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% } %>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<style>
+.volunteer-completed-page {
+  background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%);
+  min-height: 100vh;
+  padding-bottom: 3rem;
+}
+
+.volunteer-page-header {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: white;
+  padding: 2.5rem 0;
+  margin-bottom: 2rem;
+}
+
+.volunteer-page-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.volunteer-page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.volunteer-page-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-size: 1rem;
+}
+
+.volunteer-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: white;
+  color: #10B981;
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.volunteer-back-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  color: #059669;
+}
+
+.volunteer-summary-card {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 8px 16px rgba(16, 185, 129, 0.2);
+}
+
+.volunteer-summary-icon {
+  font-size: 3rem;
+  opacity: 0.9;
+}
+
+.volunteer-summary-content h3 {
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.volunteer-summary-content p {
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+}
+
+.volunteer-completed-tasks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.volunteer-completed-task-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #10B981;
+  transition: all 0.3s ease;
+}
+
+.volunteer-completed-task-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.volunteer-completed-task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.volunteer-completed-task-title-section {
+  flex: 1;
+}
+
+.volunteer-completed-task-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #0F172A;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.volunteer-completed-task-description {
+  color: #64748B;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.volunteer-completed-task-info {
+  margin-bottom: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.volunteer-info-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.volunteer-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.volunteer-info-item i {
+  font-size: 1.25rem;
+  color: #0EA5E9;
+  margin-top: 0.25rem;
+  flex-shrink: 0;
+}
+
+.volunteer-info-item div {
+  flex: 1;
+}
+
+.volunteer-info-label {
+  display: block;
+  font-size: 0.75rem;
+  color: #94A3B8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.volunteer-info-value {
+  display: block;
+  font-weight: 600;
+  color: #0F172A;
+  font-size: 0.9rem;
+}
+
+.volunteer-info-subtext {
+  display: block;
+  font-size: 0.8rem;
+  color: #64748B;
+  margin-top: 0.25rem;
+}
+
+.volunteer-completed-task-report {
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.volunteer-report-section {
+  margin-bottom: 2rem;
+}
+
+.volunteer-report-section-title {
+  font-weight: 600;
+  color: #0F172A;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.volunteer-report-text {
+  color: #64748B;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.volunteer-attachments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.volunteer-attachment-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #F8FAFC;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #0F172A;
+  transition: all 0.3s ease;
+}
+
+.volunteer-attachment-card:hover {
+  background: #E0F2FE;
+  border-color: #0EA5E9;
+  color: #0284C7;
+}
+
+.volunteer-attachment-card i:first-child {
+  font-size: 1.5rem;
+  color: #EF4444;
+}
+
+.volunteer-attachment-card span {
+  flex: 1;
+  font-size: 0.875rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.volunteer-report-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #F8FAFC;
+  border-radius: 8px;
+  color: #64748B;
+  font-size: 0.875rem;
+}
+
+.volunteer-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.volunteer-btn-primary {
+  background: #0EA5E9;
+  color: white;
+}
+
+.volunteer-btn-primary:hover {
+  background: #0284C7;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(14, 165, 233, 0.3);
+}
+
+.volunteer-btn-outline {
+  background: transparent;
+  color: #64748B;
+  border: 1px solid #e2e8f0;
+}
+
+.volunteer-btn-outline:hover {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+}
+
+.volunteer-priority-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.volunteer-priority-danger {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+.volunteer-priority-warning {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+.volunteer-priority-info {
+  background: #DBEAFE;
+  color: #2563EB;
+}
+
+.volunteer-priority-secondary {
+  background: #F1F5F9;
+  color: #64748B;
+}
+
+.volunteer-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.volunteer-status-completed {
+  background: #D1FAE5;
+  color: #059669;
+}
+
+.volunteer-empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.volunteer-empty-icon {
+  font-size: 4rem;
+  color: #10B981;
+  margin-bottom: 1rem;
+}
+
+.volunteer-empty-state h3 {
+  color: #0F172A;
+  margin-bottom: 0.5rem;
+}
+
+.volunteer-empty-state p {
+  color: #64748B;
+  margin-bottom: 1.5rem;
+}
+
+.volunteer-alert {
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 768px) {
+  .volunteer-page-title {
+    font-size: 1.5rem;
+  }
+  
+  .volunteer-completed-tasks-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .volunteer-info-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .volunteer-page-header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+</style>

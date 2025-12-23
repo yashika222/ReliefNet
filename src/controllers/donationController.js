@@ -35,16 +35,26 @@ exports.createDonation = async (req, res) => {
 };
 
 // ✅ GET DONATION BY ID  (GET /api/donations/:id)
+// ✅ GET DONATION BY ID  (GET /api/donations/:id)
 exports.getDonationById = async (req, res) => {
   try {
-    const donation = await Donation.findById(req.params.id);
+    const { id } = req.params;
+
+    // Validate ObjectId format to prevent CastError
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid Donation ID format" });
+    }
+
+    const donation = await Donation.findById(id);
 
     if (!donation) {
+      console.warn(`[Donation] Donation not found for ID: ${id}`);
       return res.status(404).json({ error: "Donation not found" });
     }
 
     return res.json(donation);
   } catch (e) {
+    console.error("Donation Fetch Error:", e);
     return res.status(500).json({ error: e.message });
   }
 };

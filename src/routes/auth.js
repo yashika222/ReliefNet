@@ -29,7 +29,7 @@ router.post('/signup',
       }
       return res.status(400).json({ errors: errors.array() });
     }
-    
+
     try {
       const { name, email, password, role } = req.body;
       if (!role) {
@@ -45,17 +45,17 @@ router.post('/signup',
         }
         return res.status(400).json({ message: 'Email already registered' });
       }
-      
+
       const user = await User.create({ name, email, password, role });
       const token = jwt.sign({ id: user._id, role: user.role, name: user.name }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
-      
+
       if (req.accepts('html')) {
         res.cookie('token', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
         if (req.session) req.session.user = { id: user._id.toString(), name: user.name, role: user.role };
         req.user = { id: user._id.toString(), name: user.name, role: user.role };
         return res.redirect('/dashboard');
       }
-      
+
       res.json({ token, user: { id: user._id, name: user.name, role: user.role } });
     } catch (err) {
       if (req.accepts('html')) {
@@ -77,25 +77,29 @@ router.post('/login',
       }
       return res.status(400).json({ errors: errors.array() });
     }
-    
+
     try {
       const { email, password } = req.body;
+      console.log(`[LOGIN ATTEMPT] Email: ${email}`);
+
       const user = await User.findOne({ email });
       if (!user) {
+        console.log('[LOGIN FAIL] User not found in DB');
         if (req.accepts('html')) {
           return res.redirect('/auth/login?error=Invalid credentials');
         }
         return res.status(401).json({ message: 'Invalid credentials' });
       }
-      
+
       const match = await user.comparePassword(password);
       if (!match) {
+        console.log('[LOGIN FAIL] Password hash mismatch');
         if (req.accepts('html')) {
           return res.redirect('/auth/login?error=Invalid credentials');
         }
         return res.status(401).json({ message: 'Invalid credentials' });
       }
-      
+
       // Check if user is blocked
       if (user.blocked) {
         if (req.accepts('html')) {
@@ -103,7 +107,7 @@ router.post('/login',
         }
         return res.status(403).json({ message: 'Account has been blocked' });
       }
-      
+
       // Check approval status for NGO and Volunteer roles (donors and admins don't need approval)
       if (user.role === 'ngo' || user.role === 'volunteer') {
         // Use approvalStatus field instead of approved field for consistency
@@ -115,9 +119,9 @@ router.post('/login',
           return res.status(403).json({ message: 'Awaiting admin approval' });
         }
       }
-      
+
       const token = jwt.sign({ id: user._id, role: user.role, name: user.name }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
-      
+
       if (req.accepts('html')) {
         res.cookie('token', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
         if (req.session) req.session.user = { id: user._id.toString(), name: user.name, role: user.role };
@@ -128,7 +132,7 @@ router.post('/login',
         if (user.role === 'volunteer') return res.redirect('/volunteer/dashboard');
         return res.redirect('/donor/home');
       }
-      
+
       res.json({ token, user: { id: user._id, name: user.name, role: user.role } });
     } catch (err) {
       if (req.accepts('html')) {

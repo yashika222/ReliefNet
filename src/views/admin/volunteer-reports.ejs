@@ -1,0 +1,482 @@
+<main class="container-fluid py-4">
+  <header class="admin-page-header mb-4">
+    <div>
+      <h1>Volunteer Reports</h1>
+      <p class="text-muted mb-0">
+        Review reports submitted by volunteers for their assigned tasks.
+      </p>
+    </div>
+    <div class="admin-page-actions">
+      <button type="button" class="btn btn-outline-primary" id="refreshBtn">
+        <i class="bi bi-arrow-clockwise"></i> Refresh
+      </button>
+    </div>
+  </header>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <i class="bi bi-exclamation-circle-fill"></i> <%= error %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  <% } %>
+
+  <!-- Filters -->
+  <section class="admin-panel mb-4">
+    <div class="admin-panel__heading">
+      <h2>Filters</h2>
+    </div>
+    <form method="GET" action="/admin/volunteer-reports" class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">Search</label>
+        <input type="text" name="search" class="form-control" 
+          placeholder="Search by task title or report description" 
+          value="<%= filters.search %>">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Volunteer</label>
+        <select name="volunteerId" class="form-select">
+          <option value="">All volunteers</option>
+          <% volunteers.forEach(vol => { %>
+            <option value="<%= vol._id %>" <%= filters.volunteerId === vol._id.toString() ? 'selected' : '' %>>
+              <%= vol.name %> (<%= vol.email %>)
+            </option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Task Status</label>
+        <select name="status" class="form-select">
+          <option value="">All statuses</option>
+          <option value="assigned" <%= filters.status === 'assigned' ? 'selected' : '' %>>Assigned</option>
+          <option value="in_progress" <%= filters.status === 'in_progress' ? 'selected' : '' %>>In Progress</option>
+          <option value="completed" <%= filters.status === 'completed' ? 'selected' : '' %>>Completed</option>
+        </select>
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-funnel"></i> Filter
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Reports List -->
+  <section class="admin-table-card">
+    <div class="admin-table-card__header">
+      <h2>Submitted Reports</h2>
+      <p class="text-muted small mb-0">
+        Total: <strong><%= pagination.total %></strong> report<%= pagination.total !== 1 ? 's' : '' %>
+      </p>
+    </div>
+
+    <% if (!reports || reports.length === 0) { %>
+      <div class="admin-empty-state">
+        <i class="bi bi-file-earmark-text"></i>
+        <h3>No Reports Found</h3>
+        <p>No volunteer reports match your current filters.</p>
+      </div>
+    <% } else { %>
+      <div class="volunteer-reports-grid">
+        <% reports.forEach(report => { %>
+          <div class="volunteer-report-card">
+            <div class="volunteer-report-header">
+              <div class="volunteer-report-title-section">
+                <h3 class="volunteer-report-title">
+                  <i class="bi bi-file-earmark-text-fill"></i>
+                  <%= report.title %>
+                </h3>
+                <div class="volunteer-report-meta">
+                  <span class="volunteer-report-volunteer">
+                    <i class="bi bi-person"></i>
+                    <%= report.volunteerId?.name || 'Unknown Volunteer' %>
+                  </span>
+                  <span class="volunteer-report-date">
+                    <i class="bi bi-calendar"></i>
+                    <%= new Date(report.report.submittedAt).toLocaleString() %>
+                  </span>
+                </div>
+              </div>
+              <div class="volunteer-report-status">
+                <% if (report.status === 'completed') { %>
+                  <span class="badge bg-success">
+                    <i class="bi bi-check-circle-fill"></i> Completed
+                  </span>
+                <% } else if (report.status === 'in_progress') { %>
+                  <span class="badge bg-primary">
+                    <i class="bi bi-arrow-repeat"></i> In Progress
+                  </span>
+                <% } else { %>
+                  <span class="badge bg-warning">
+                    <i class="bi bi-clock-fill"></i> Assigned
+                  </span>
+                <% } %>
+              </div>
+            </div>
+
+            <div class="volunteer-report-content">
+              <div class="volunteer-report-section">
+                <h5 class="volunteer-report-section-title">Task Details</h5>
+                <% if (report.description) { %>
+                  <p class="volunteer-report-text"><%= report.description %></p>
+                <% } %>
+                <div class="volunteer-report-task-info">
+                  <% if (report.disaster) { %>
+                    <span class="volunteer-report-info-item">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      <%= report.disaster.title %>
+                    </span>
+                  <% } %>
+                  <% if (report.deadline) { %>
+                    <span class="volunteer-report-info-item">
+                      <i class="bi bi-calendar-event"></i>
+                      Deadline: <%= new Date(report.deadline).toLocaleDateString() %>
+                    </span>
+                  <% } %>
+                  <% if (report.priority) { %>
+                    <span class="volunteer-report-info-item">
+                      <i class="bi bi-flag"></i>
+                      Priority: <%= report.priority.charAt(0).toUpperCase() + report.priority.slice(1) %>
+                    </span>
+                  <% } %>
+                </div>
+              </div>
+
+              <div class="volunteer-report-section">
+                <h5 class="volunteer-report-section-title">Report Description</h5>
+                <p class="volunteer-report-text"><%= report.report.description %></p>
+              </div>
+
+              <% if (report.report.attachments && report.report.attachments.length > 0) { %>
+                <div class="volunteer-report-section">
+                  <h5 class="volunteer-report-section-title">
+                    <i class="bi bi-paperclip"></i> Attachments (<%= report.report.attachments.length %>)
+                  </h5>
+                  <div class="volunteer-report-attachments">
+                    <% report.report.attachments.forEach(att => { %>
+                      <div class="volunteer-report-attachment">
+                        <% 
+                          const fileIcon = att.mimeType === 'application/pdf' 
+                            ? 'bi-file-earmark-pdf-fill' 
+                            : (att.mimeType && att.mimeType.startsWith('image/') 
+                              ? 'bi-file-earmark-image-fill' 
+                              : 'bi-file-earmark-fill');
+                          const downloadUrl = att.url.startsWith('/') ? att.url : '/' + att.url;
+                        %>
+                        <i class="bi <%= fileIcon %>"></i>
+                        <span><%= att.originalName %></span>
+                        <div class="volunteer-report-attachment-actions">
+                          <a href="<%= downloadUrl %>" target="_blank" class="btn btn-sm btn-outline-primary" title="View">
+                            <i class="bi bi-eye"></i>
+                          </a>
+                          <a href="<%= downloadUrl %>" download="<%= att.originalName %>" class="btn btn-sm btn-outline-success" title="Download">
+                            <i class="bi bi-download"></i>
+                          </a>
+                        </div>
+                      </div>
+                    <% }) %>
+                  </div>
+                </div>
+              <% } %>
+
+              <div class="volunteer-report-footer">
+                <div class="volunteer-report-contact">
+                  <strong>Volunteer Contact:</strong>
+                  <a href="mailto:<%= report.volunteerId?.email %>">
+                    <i class="bi bi-envelope"></i> <%= report.volunteerId?.email || 'N/A' %>
+                  </a>
+                </div>
+                <% if (report.volunteerId?._id) { %>
+                  <a href="/admin/manage-volunteers?volunteer=<%= report.volunteerId._id %>" 
+                     class="btn btn-sm btn-outline-primary" 
+                     id="viewProfileBtn_<%= report.volunteerId._id %>">
+                    <i class="bi bi-person-lines-fill"></i> View Volunteer Profile
+                  </a>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+
+      <!-- Pagination -->
+      <% if (pagination.totalPages > 1) { %>
+        <nav class="mt-4">
+          <ul class="pagination justify-content-center">
+            <% if (pagination.page > 1) { %>
+              <li class="page-item">
+                <a class="page-link" href="?page=<%= pagination.page - 1 %>&search=<%= filters.search %>&volunteerId=<%= filters.volunteerId %>&status=<%= filters.status %>">Previous</a>
+              </li>
+            <% } %>
+            <% for (let i = Math.max(1, pagination.page - 2); i <= Math.min(pagination.totalPages, pagination.page + 2); i++) { %>
+              <li class="page-item <%= i === pagination.page ? 'active' : '' %>">
+                <a class="page-link" href="?page=<%= i %>&search=<%= filters.search %>&volunteerId=<%= filters.volunteerId %>&status=<%= filters.status %>"><%= i %></a>
+              </li>
+            <% } %>
+            <% if (pagination.page < pagination.totalPages) { %>
+              <li class="page-item">
+                <a class="page-link" href="?page=<%= pagination.page + 1 %>&search=<%= filters.search %>&volunteerId=<%= filters.volunteerId %>&status=<%= filters.status %>">Next</a>
+              </li>
+            <% } %>
+          </ul>
+        </nav>
+      <% } %>
+    <% } %>
+  </section>
+</main>
+
+<style>
+.volunteer-reports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  gap: 1.5rem;
+}
+
+.volunteer-report-card {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.volunteer-report-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.volunteer-report-header {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.volunteer-report-title-section {
+  flex: 1;
+}
+
+.volunteer-report-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.volunteer-report-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.volunteer-report-volunteer,
+.volunteer-report-date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.volunteer-report-status {
+  flex-shrink: 0;
+}
+
+.volunteer-report-content {
+  padding: 1.5rem;
+}
+
+.volunteer-report-section {
+  margin-bottom: 1.5rem;
+}
+
+.volunteer-report-section:last-child {
+  margin-bottom: 0;
+}
+
+.volunteer-report-section-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.volunteer-report-text {
+  color: #0F172A;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 0.75rem;
+}
+
+.volunteer-report-task-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.volunteer-report-info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #F8FAFC;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  color: #64748B;
+}
+
+.volunteer-report-attachments {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.volunteer-report-attachment {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #F8FAFC;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #0F172A;
+  transition: all 0.3s ease;
+}
+
+.volunteer-report-attachment:hover {
+  background: #E0F2FE;
+  border-color: #0EA5E9;
+}
+
+.volunteer-report-attachment i:first-child {
+  font-size: 1.5rem;
+  color: #EF4444;
+  flex-shrink: 0;
+}
+
+.volunteer-report-attachment span {
+  flex: 1;
+  font-size: 0.875rem;
+  word-break: break-word;
+}
+
+.volunteer-report-attachment-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.volunteer-report-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  margin-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.volunteer-report-contact {
+  color: #64748B;
+  font-size: 0.875rem;
+}
+
+.volunteer-report-contact a {
+  color: #0EA5E9;
+  text-decoration: none;
+  margin-left: 0.5rem;
+}
+
+.volunteer-report-contact a:hover {
+  text-decoration: underline;
+}
+
+.admin-empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #64748B;
+}
+
+.admin-empty-state i {
+  font-size: 4rem;
+  color: #CBD5E1;
+  margin-bottom: 1rem;
+}
+
+.admin-empty-state h3 {
+  color: #0F172A;
+  margin-bottom: 0.5rem;
+}
+
+.admin-empty-state p {
+  color: #64748B;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .volunteer-reports-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .volunteer-report-header {
+    flex-direction: column;
+  }
+  
+  .volunteer-report-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const refreshBtn = document.getElementById('refreshBtn');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', () => {
+      window.location.reload();
+    });
+  }
+  
+  // Handle view profile buttons - ensure they navigate correctly
+  document.querySelectorAll('[id^="viewProfileBtn_"]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      // Let the link navigate normally - the manage-volunteers page will handle opening the modal
+      // No need to prevent default
+    });
+  });
+  
+  // Fix download links to ensure they work properly
+  document.querySelectorAll('.volunteer-report-attachment a[download]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      // Ensure download works - if it fails, try opening in new tab
+      const href = link.getAttribute('href');
+      if (!href) {
+        e.preventDefault();
+        return;
+      }
+      // If the download doesn't work, at least open the file
+      setTimeout(() => {
+        const newWindow = window.open(href, '_blank');
+        if (!newWindow) {
+          console.warn('Popup blocked. Please allow popups to download files.');
+        }
+      }, 100);
+    });
+  });
+});
+</script>
+

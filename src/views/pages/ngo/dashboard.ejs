@@ -1,82 +1,616 @@
-<div class="container mx-auto px-4 py-6">
-  <h1 class="text-2xl font-bold mb-1">NGO Dashboard</h1>
-  <p class="text-sm text-gray-600 mb-4">Welcome NGO</p>
-
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-    <div class="p-4 bg-white shadow rounded">
-      <p class="text-sm text-gray-500">Total Donations Received</p>
-      <p class="text-2xl font-semibold">--</p>
-    </div>
-    <div class="p-4 bg-white shadow rounded">
-      <p class="text-sm text-gray-500">Active Campaigns</p>
-      <p class="text-2xl font-semibold"><%= (campaigns||[]).length %></p>
-    </div>
-    <div class="p-4 bg-white shadow rounded">
-      <p class="text-sm text-gray-500">Volunteer Requests</p>
-      <p class="text-2xl font-semibold">--</p>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <div class="p-4 bg-white shadow rounded">
-      <h2 class="font-semibold mb-4">Create Campaign</h2>
-      <form id="campaignForm" class="space-y-4">
-        <div>
-          <label class="block text-sm mb-1">Title <span class="text-red-600">*</span></label>
-          <input type="text" name="title" required class="w-full border rounded px-3 py-2" placeholder="Campaign title" />
-        </div>
-        <div>
-          <label class="block text-sm mb-1">Description</label>
-          <textarea name="description" rows="3" class="w-full border rounded px-3 py-2" placeholder="Describe your campaign"></textarea>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div>
-            <label class="block text-sm mb-1">Target Amount (₹)</label>
-            <input type="number" name="targetAmount" min="0" class="w-full border rounded px-3 py-2" />
+<main class="ngo-dashboard">
+  <!-- Hero Section -->
+  <div class="ngo-hero">
+    <div class="container">
+      <div class="ngo-hero-content">
+        <div class="ngo-hero-main">
+          <div class="ngo-avatar">
+            <i class="bi bi-building"></i>
           </div>
-          <div>
-            <label class="block text-sm mb-1">Start Date</label>
-            <input type="date" name="startDate" class="w-full border rounded px-3 py-2" />
-          </div>
-          <div>
-            <label class="block text-sm mb-1">End Date</label>
-            <input type="date" name="endDate" class="w-full border rounded px-3 py-2" />
+          <div class="ngo-hero-text">
+            <h1 class="ngo-hero-title">Welcome, <%= user?.name || 'NGO' %>!</h1>
+            <p class="ngo-hero-subtitle">Manage your campaigns and make a difference in disaster relief</p>
           </div>
         </div>
-        <div>
-          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Submit For Approval</button>
+        <div class="ngo-hero-actions">
+          <a href="/ngo/campaigns/old" class="ngo-cta-btn ngo-cta-btn-outline">
+            <i class="bi bi-archive"></i> Old Campaigns
+          </a>
+          <a href="/ngo/upload-proof" class="ngo-cta-btn">
+            <i class="bi bi-file-earmark-arrow-up"></i> Upload Proof
+          </a>
         </div>
-        <div id="campaignStatus" class="text-sm"></div>
-      </form>
-    </div>
-
-    <div class="p-4 bg-white shadow rounded">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="font-semibold">My Campaigns</h2>
-        <button id="reloadCampaigns" class="px-3 py-1.5 border rounded">Reload</button>
-      </div>
-      <div class="overflow-x-auto">
-        <table class="min-w-full text-sm">
-          <thead>
-            <tr class="border-b bg-gray-50">
-              <th class="text-left p-2">Title</th>
-              <th class="text-left p-2">Status</th>
-              <th class="text-left p-2">Created</th>
-            </tr>
-          </thead>
-          <tbody id="campaignsTableBody">
-            <% (campaigns||[]).forEach(c => { %>
-              <tr class="border-b">
-                <td class="p-2"><%= c.title %></td>
-                <td class="p-2"><span class="px-2 py-0.5 rounded text-white <%= c.status==='approved' ? 'bg-green-600' : (c.status==='rejected' ? 'bg-red-600' : 'bg-yellow-600') %>"><%= c.status %></span></td>
-                <td class="p-2"><%= new Date(c.createdAt).toLocaleDateString() %></td>
-              </tr>
-            <% }) %>
-          </tbody>
-        </table>
       </div>
     </div>
   </div>
-</div>
+
+  <!-- Stats Cards -->
+  <div class="container mt-4">
+    <div class="ngo-stats-grid">
+      <div class="ngo-stat-card">
+        <div class="ngo-stat-icon ngo-stat-icon-primary">
+          <i class="bi bi-cash-coin"></i>
+        </div>
+        <div class="ngo-stat-content">
+          <div class="ngo-stat-value">₹0</div>
+          <div class="ngo-stat-label">Total Donations</div>
+        </div>
+      </div>
+      
+      <div class="ngo-stat-card ngo-stat-card-success">
+        <div class="ngo-stat-icon ngo-stat-icon-success">
+          <i class="bi bi-megaphone"></i>
+        </div>
+        <div class="ngo-stat-content">
+          <div class="ngo-stat-value"><%= (campaigns||[]).length %></div>
+          <div class="ngo-stat-label">Active Campaigns</div>
+        </div>
+      </div>
+      
+      <div class="ngo-stat-card">
+        <div class="ngo-stat-icon ngo-stat-icon-info">
+          <i class="bi bi-people"></i>
+        </div>
+        <div class="ngo-stat-content">
+          <div class="ngo-stat-value">--</div>
+          <div class="ngo-stat-label">Volunteer Requests</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container mt-5">
+    <div class="row g-4">
+      <!-- Create Campaign Card -->
+      <div class="col-lg-6">
+        <div class="ngo-card">
+          <div class="ngo-card-header">
+            <h2 class="ngo-card-title">
+              <i class="bi bi-plus-circle-fill"></i> Create New Campaign
+            </h2>
+            <p class="ngo-card-subtitle">Start a new fundraising campaign for disaster relief</p>
+          </div>
+          <div class="ngo-card-body">
+            <form id="campaignForm" class="ngo-form">
+              <div class="ngo-form-group">
+                <label class="ngo-form-label">Campaign Title <span class="text-danger">*</span></label>
+                <input type="text" name="title" required class="ngo-form-input" placeholder="Enter campaign title" />
+              </div>
+              
+              <div class="ngo-form-group">
+                <label class="ngo-form-label">Description</label>
+                <textarea name="description" rows="4" class="ngo-form-input" placeholder="Describe your campaign goals and how funds will be used"></textarea>
+              </div>
+              
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <div class="ngo-form-group">
+                    <label class="ngo-form-label">Target Amount (₹)</label>
+                    <input type="number" name="targetAmount" min="0" class="ngo-form-input" placeholder="0" />
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="ngo-form-group">
+                    <label class="ngo-form-label">Start Date</label>
+                    <input type="date" name="startDate" class="ngo-form-input" />
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="ngo-form-group">
+                    <label class="ngo-form-label">End Date</label>
+                    <input type="date" name="endDate" class="ngo-form-input" />
+                  </div>
+                </div>
+              </div>
+              
+              <div id="campaignStatus" class="ngo-form-status"></div>
+              
+              <button type="submit" class="ngo-btn ngo-btn-primary w-100">
+                <i class="bi bi-send"></i> Submit For Approval
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Campaigns Card -->
+      <div class="col-lg-6">
+        <div class="ngo-card">
+          <div class="ngo-card-header">
+            <div>
+              <h2 class="ngo-card-title">
+                <i class="bi bi-list-ul"></i> Active Campaigns
+              </h2>
+              <p class="ngo-card-subtitle">Your ongoing and pending campaigns</p>
+            </div>
+            <button id="reloadCampaigns" class="ngo-btn-icon" title="Reload campaigns">
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
+          </div>
+          <div class="ngo-card-body">
+            <% if (!campaigns || campaigns.length === 0) { %>
+              <div class="ngo-empty-state">
+                <i class="bi bi-inbox"></i>
+                <h4>No Active Campaigns</h4>
+                <p>Create your first campaign to start fundraising for disaster relief efforts.</p>
+              </div>
+            <% } else { %>
+              <div class="ngo-campaigns-list">
+                <% campaigns.forEach(campaign => { %>
+                  <div class="ngo-campaign-item">
+                    <div class="ngo-campaign-main">
+                      <h4 class="ngo-campaign-title"><%= campaign.title %></h4>
+                      <% if (campaign.description) { %>
+                        <p class="ngo-campaign-description"><%= campaign.description.length > 100 ? campaign.description.substring(0, 100) + '...' : campaign.description %></p>
+                      <% } %>
+                      <div class="ngo-campaign-meta">
+                        <span class="ngo-campaign-meta-item">
+                          <i class="bi bi-calendar"></i>
+                          <%= new Date(campaign.createdAt).toLocaleDateString() %>
+                        </span>
+                        <% if (campaign.targetAmount) { %>
+                          <span class="ngo-campaign-meta-item">
+                            <i class="bi bi-cash"></i>
+                            ₹<%= campaign.targetAmount.toLocaleString() %>
+                          </span>
+                        <% } %>
+                      </div>
+                    </div>
+                    <div class="ngo-campaign-status">
+                      <% if (campaign.status === 'approved') { %>
+                        <span class="ngo-status-badge ngo-status-approved">
+                          <i class="bi bi-check-circle-fill"></i> Approved
+                        </span>
+                      <% } else if (campaign.status === 'rejected') { %>
+                        <span class="ngo-status-badge ngo-status-rejected">
+                          <i class="bi bi-x-circle-fill"></i> Rejected
+                        </span>
+                      <% } else { %>
+                        <span class="ngo-status-badge ngo-status-pending">
+                          <i class="bi bi-clock-fill"></i> Pending
+                        </span>
+                      <% } %>
+                    </div>
+                  </div>
+                <% }) %>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<style>
+.ngo-dashboard {
+  background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%);
+  min-height: 100vh;
+  padding-bottom: 3rem;
+}
+
+/* Hero Section */
+.ngo-hero {
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  color: white;
+  padding: 3rem 0;
+  margin-bottom: 2rem;
+}
+
+.ngo-hero-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.ngo-hero-main {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.ngo-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  flex-shrink: 0;
+}
+
+.ngo-hero-text {
+  flex: 1;
+}
+
+.ngo-hero-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.ngo-hero-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-size: 1rem;
+}
+
+.ngo-hero-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ngo-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: white;
+  color: #8B5CF6;
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ngo-cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  color: #7C3AED;
+}
+
+.ngo-cta-btn-outline {
+  background: transparent;
+  color: white;
+  border: 2px solid white;
+}
+
+.ngo-cta-btn-outline:hover {
+  background: white;
+  color: #8B5CF6;
+}
+
+/* Stats Grid */
+.ngo-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.ngo-stat-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.ngo-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.ngo-stat-card-success {
+  border-left: 4px solid #10B981;
+}
+
+.ngo-stat-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.ngo-stat-icon-primary {
+  background: #E9D5FF;
+  color: #8B5CF6;
+}
+
+.ngo-stat-icon-success {
+  background: #D1FAE5;
+  color: #10B981;
+}
+
+.ngo-stat-icon-info {
+  background: #DBEAFE;
+  color: #2563EB;
+}
+
+.ngo-stat-content {
+  flex: 1;
+}
+
+.ngo-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0F172A;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.ngo-stat-label {
+  font-size: 0.875rem;
+  color: #64748B;
+  font-weight: 500;
+}
+
+/* Card Styles */
+.ngo-card {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.ngo-card-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.ngo-card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0F172A;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ngo-card-subtitle {
+  color: #64748B;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.ngo-card-body {
+  padding: 1.5rem;
+  flex: 1;
+}
+
+/* Form Styles */
+.ngo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.ngo-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ngo-form-label {
+  font-weight: 600;
+  color: #0F172A;
+  font-size: 0.875rem;
+}
+
+.ngo-form-input {
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.ngo-form-input:focus {
+  outline: none;
+  border-color: #8B5CF6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.ngo-form-status {
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+/* Button Styles */
+.ngo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.ngo-btn-primary {
+  background: #8B5CF6;
+  color: white;
+}
+
+.ngo-btn-primary:hover {
+  background: #7C3AED;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
+}
+
+.ngo-btn-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #F8FAFC;
+  border: 1px solid #e2e8f0;
+  color: #64748B;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ngo-btn-icon:hover {
+  background: #E2E8F0;
+  color: #0F172A;
+}
+
+/* Campaigns List */
+.ngo-campaigns-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ngo-campaign-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: #F8FAFC;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.ngo-campaign-item:hover {
+  background: #F1F5F9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.ngo-campaign-main {
+  flex: 1;
+}
+
+.ngo-campaign-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #0F172A;
+  margin-bottom: 0.5rem;
+}
+
+.ngo-campaign-description {
+  color: #64748B;
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.ngo-campaign-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.ngo-campaign-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #64748B;
+  font-size: 0.8rem;
+}
+
+.ngo-campaign-status {
+  flex-shrink: 0;
+}
+
+.ngo-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ngo-status-approved {
+  background: #D1FAE5;
+  color: #059669;
+}
+
+.ngo-status-rejected {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+.ngo-status-pending {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+.ngo-empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #64748B;
+}
+
+.ngo-empty-state i {
+  font-size: 3rem;
+  color: #CBD5E1;
+  margin-bottom: 1rem;
+}
+
+.ngo-empty-state h4 {
+  color: #0F172A;
+  margin-bottom: 0.5rem;
+}
+
+.ngo-empty-state p {
+  color: #64748B;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .ngo-hero-title {
+    font-size: 1.5rem;
+  }
+  
+  .ngo-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .ngo-hero-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .ngo-hero-actions {
+    width: 100%;
+  }
+  
+  .ngo-cta-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .ngo-campaign-item {
+    flex-direction: column;
+  }
+}
+</style>
 
 <script src="/public/js/ngo/dashboard.js"></script>
