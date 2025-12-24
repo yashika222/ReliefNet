@@ -34,12 +34,12 @@
                       <% } %>
                         <% } %>
 
-                          <% if (typeof user !=='undefined' && user) { %>
+                          <% if (typeof user !=='undefined' && user && user.name) { %>
                             <!-- User Section -->
                             <div class="navbar-user">
                               <div class="navbar-user-info">
                                 <div class="navbar-avatar">
-                                  <%= user.name.charAt(0).toUpperCase() %>
+                                  <%= (user.name && user.name.charAt(0).toUpperCase()) || 'U' %>
                                 </div>
                                 <div class="navbar-user-details">
                                   <div class="navbar-user-name">
@@ -100,11 +100,11 @@
                       <% } %>
                         <% } %>
 
-                          <% if (typeof user !=='undefined' && user) { %>
+                          <% if (typeof user !=='undefined' && user && user.name) { %>
                             <div class="navbar-mobile-auth">
                               <div class="navbar-mobile-user">
                                 <div class="navbar-avatar">
-                                  <%= user.name.charAt(0).toUpperCase() %>
+                                  <%= (user.name && user.name.charAt(0).toUpperCase()) || 'U' %>
                                 </div>
                                 <div class="navbar-user-details">
                                   <div class="navbar-user-name">
