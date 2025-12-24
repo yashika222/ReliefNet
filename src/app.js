@@ -100,7 +100,19 @@ app.use(cors());
 app.use(compression());
 app.use(cookieParser());
 app.use(morgan('dev'));
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
+
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'production' ? 1000 : 5000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: 'Too many requests, please try again later.'
+});
+
+app.use(limiter);
+
+
 app.use(requestLogger);
 
 // ✅ Global User Middleware (Prevents EJS crashes)
