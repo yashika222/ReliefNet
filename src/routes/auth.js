@@ -129,7 +129,12 @@ router.post('/login',
       const token = jwt.sign({ id: user._id, role: user.role, name: user.name }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
 
       if (req.accepts('html')) {
-        res.cookie('token', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
+        res.cookie('token', token, {
+          httpOnly: true,
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax'
+        });
         if (req.session) req.session.user = { id: user._id.toString(), name: user.name, role: user.role };
         req.user = { id: user._id.toString(), name: user.name, role: user.role };
         // Role-based redirection

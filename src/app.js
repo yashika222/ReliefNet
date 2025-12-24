@@ -38,8 +38,6 @@ app.use('/public', express.static(path.join(__dirname, '..', 'public')));
 
 // Middleware
 // Hardened Helmet + CSP configuration (no inline scripts)
-
-
 app.use(helmet({
   crossOriginEmbedderPolicy: false,
   crossOriginResourcePolicy: { policy: 'cross-origin' },
@@ -105,14 +103,33 @@ app.use(morgan('dev'));
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 app.use(requestLogger);
 
+// ✅ Global User Middleware (Prevents EJS crashes)
+app.use((req, res, next) => {
+  res.locals.user = req.user || null;
+  // Also try to get user from token if not already set (for EJS robustness)
+  if (!req.user && req.cookies && req.cookies.token) {
+    try {
+      const jwt = require('jsonwebtoken'); // Lazy require
+      const payload = jwt.verify(req.cookies.token, process.env.JWT_SECRET);
+      req.user = payload;
+      res.locals.user = payload;
+    } catch (e) {
+      // Token invalid, valid behavior to ignore
+    }
+  }
+  next();
+});
+
 // Health route
-app.get('/health', (req, res) => res.json({ ok: true }));
+app.get('/health', (req, res) => res.status(200).json({ ok: true, timestamp: new Date() }));
 
-// ✅ Railway safe root route
-
-// app.get('/', (req, res) => {
-//   res.status(200).send('OK');
-// });
+// ✅ Root Route
+app.get('/', (req, res) => {
+  if (req.user) {
+    return res.redirect('/dashboard');
+  }
+  res.render('pages/index', { title: 'Disaster Relief System' });
+});
 
 // ✅ Routes
 app.use('/', indexRoutes);
@@ -134,7 +151,15 @@ app.use('/disasters', disasterRoutes);
 
 // 404
 app.use((req, res) => {
-  res.status(404).json({ message: 'Route not found' });
+  // If API, return JSON
+  if (req.xhr || req.url.startsWith('/api')) {
+    return res.status(404).json({ message: 'Route not found' });
+  }
+  // Otherwise render 404 page if exists, or simple text
+  res.status(404).render('pages/404', { title: '404 Not Found' }, (err, html) => {
+    if (err) return res.status(404).send('Page not found');
+    res.send(html);
+  });
 });
 
 

@@ -1,40 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title><%= typeof title !== 'undefined' ? title : 'Disaster Relief' %></title>
-  
+  <title>
+    <%= typeof title !=='undefined' ? title : 'Disaster Relief' %>
+  </title>
+
   <!-- CSS Files -->
   <link rel="stylesheet" href="/public/css/main.css">
   <link rel="stylesheet" href="/public/css/components.css">
   <link rel="stylesheet" href="/public/css/pages.css">
-  
-  
+
+
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
+
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/public/img/favicon.svg">
-  
+
   <!-- Socket.io -->
   <script src="/socket.io/socket.io.js"></script>
   <script src="/public/js/socket.js"></script>
   <script src="/public/js/navbar.js"></script>
 </head>
+
 <body>
   <%- include('partials/navbar') %>
-  
-  <!-- Urgent Notification Bar -->
-  <div id="urgent-banner" class="urgent-banner hidden">
-    No urgent alerts.
-  </div>
-  
-  <main style="min-height: 100vh; padding-top: 4rem;">
-    <%- body %>
-  </main>
-  <%- include('partials/footer') %>
-  
-  
+
+    <!-- Urgent Notification Bar -->
+    <div id="urgent-banner" class="urgent-banner hidden">
+      No urgent alerts.
+    </div>
+
+    <main style="min-height: 100vh; padding-top: 4rem;">
+      <%- body %>
+    </main>
+    <%- include('partials/footer') %>
+
+
 </body>
+
 </html>

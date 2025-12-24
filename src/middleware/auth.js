@@ -4,11 +4,11 @@ const User = require('../models/User');
 // Middleware to check if user is authenticated (for web pages)
 function requireAuth(req, res, next) {
   const token = req.cookies.token || req.headers.authorization?.replace('Bearer ', '');
-  
+
   if (!token) {
     return res.redirect('/login');
   }
-  
+
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
     req.user = payload;
@@ -40,13 +40,17 @@ function verifyToken(req, res, next) {
 // Middleware to check if user is authenticated but allow access to login/signup
 function optionalAuth(req, res, next) {
   const token = req.cookies.token || req.headers.authorization?.replace('Bearer ', '');
-  
+
   if (token) {
     try {
       const payload = jwt.verify(token, process.env.JWT_SECRET);
       req.user = payload;
     } catch (err) {
-      res.clearCookie('token');
+      // Allow passing through (user just won't be set)
+      // Only clear cookie if it was actually invalid (to prevent loops)
+      if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
+        res.clearCookie('token');
+      }
     }
   }
   next();
@@ -99,11 +103,11 @@ function redirectIfAuthenticated(req, res, next) {
   next();
 }
 
-module.exports = { 
-  requireAuth, 
-  verifyToken, 
-  optionalAuth, 
-  requireRoles, 
+module.exports = {
+  requireAuth,
+  verifyToken,
+  optionalAuth,
+  requireRoles,
   ensureRole,
-  redirectIfAuthenticated 
+  redirectIfAuthenticated
 };

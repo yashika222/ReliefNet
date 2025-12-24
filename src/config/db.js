@@ -20,6 +20,7 @@ async function connectDB() {
     await mongoose.connect(MONGO_URI, {
       autoIndex: false,
       serverSelectionTimeoutMS: 5000,
+      dbName: 'disaster_relief' // Force consistent DB name
     });
 
     isConnected = true;
@@ -32,15 +33,17 @@ async function connectDB() {
 
     console.error('❌ MongoDB connection failed:', error.message);
 
-    // ❗ DO NOT EXIT PROCESS (important for Railway)
+    // ❗ DO NOT EXIT PROCESS (important for Railway/Render health checks)
   }
 }
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
   try {
-    await mongoose.connection.close();
-    logger.info('MongoDB disconnected on app termination');
+    if (isConnected) {
+      await mongoose.connection.close();
+      logger.info('MongoDB disconnected on app termination');
+    }
     process.exit(0);
   } catch (err) {
     process.exit(1);

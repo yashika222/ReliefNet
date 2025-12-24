@@ -5,58 +5,64 @@
       <div class="navbar-logo">DR</div>
       <span class="navbar-title">Disaster Relief</span>
     </div>
-    
+
     <!-- Navigation Links -->
     <div class="navbar-nav">
       <a class="navbar-link" href="/">Home</a>
       <a class="navbar-link" href="/about">About</a>
       <a class="navbar-link" href="/resources">Resources</a>
       <a class="navbar-link" href="/disasters">Live Disasters</a>
-      <% if (typeof user !== 'undefined' && user) { %>
-        <% if (user.role === 'admin') { %>
+      <% if (typeof user !=='undefined' && user) { %>
+        <% if (user.role==='admin' ) { %>
           <a class="navbar-link" href="/admin/dashboard">Dashboard</a>
           <a class="navbar-link" href="/admin/manage-volunteers">Manage Users</a>
           <a class="navbar-link" href="/admin/volunteer-reports">Volunteer Reports</a>
           <a class="navbar-link" href="/admin/approvals">Approve NGOs</a>
-        <% } %>
-        <% if (user.role === 'ngo') { %>
-          <a class="navbar-link" href="/ngo/dashboard">My Campaigns</a>
-          <a class="navbar-link" href="/ngo/campaigns/old">Old Campaigns</a>
-          <a class="navbar-link" href="/ngo/upload-proof">Upload Proof</a>
-        <% } %>
-        <% if (user.role === 'volunteer') { %>
-          <a class="navbar-link" href="/volunteer/dashboard">Tasks</a>
-          <a class="navbar-link" href="/volunteer/tasks/completed">Completed Tasks</a>
-        <% } %>
-        <% if (user.role === 'donor') { %>
-          <a class="navbar-link" href="/donate">Donate</a>
-          <a class="navbar-link" href="/donor/home">My Donations</a>
-        <% } %>
-      <% } %>
-      
-      <% if (typeof user !== 'undefined' && user) { %>
-        <!-- User Section -->
-        <div class="navbar-user">
-          <div class="navbar-user-info">
-            <div class="navbar-avatar"><%= user.name.charAt(0).toUpperCase() %></div>
-            <div class="navbar-user-details">
-              <div class="navbar-user-name"><%= user.name %></div>
-              <div class="navbar-user-role"><%= user.role %></div>
-            </div>
-          </div>
-          <form action="/auth/logout" method="POST" style="display: inline;">
-            <button type="submit" class="navbar-logout">Logout</button>
-          </form>
-        </div>
-      <% } else { %>
-        <!-- Login/Signup Links -->
-        <div class="navbar-auth">
-          <a class="navbar-auth-link" href="/auth/login">Login</a>
-          <a class="navbar-auth-btn" href="/auth/signup">Sign Up</a>
-        </div>
-      <% } %>
+          <% } %>
+            <% if (user.role==='ngo' ) { %>
+              <a class="navbar-link" href="/ngo/dashboard">My Campaigns</a>
+              <a class="navbar-link" href="/ngo/campaigns/old">Old Campaigns</a>
+              <a class="navbar-link" href="/ngo/upload-proof">Upload Proof</a>
+              <% } %>
+                <% if (user.role==='volunteer' ) { %>
+                  <a class="navbar-link" href="/volunteer/dashboard">Tasks</a>
+                  <a class="navbar-link" href="/volunteer/tasks/completed">Completed Tasks</a>
+                  <% } %>
+                    <% if (user.role==='donor' ) { %>
+                      <a class="navbar-link" href="/donate">Donate</a>
+                      <a class="navbar-link" href="/donor/home">My Donations</a>
+                      <% } %>
+                        <% } %>
+
+                          <% if (typeof user !=='undefined' && user) { %>
+                            <!-- User Section -->
+                            <div class="navbar-user">
+                              <div class="navbar-user-info">
+                                <div class="navbar-avatar">
+                                  <%= user.name.charAt(0).toUpperCase() %>
+                                </div>
+                                <div class="navbar-user-details">
+                                  <div class="navbar-user-name">
+                                    <%= user.name %>
+                                  </div>
+                                  <div class="navbar-user-role">
+                                    <%= user.role %>
+                                  </div>
+                                </div>
+                              </div>
+                              <form action="/auth/logout" method="POST" style="display: inline;">
+                                <button type="submit" class="navbar-logout">Logout</button>
+                              </form>
+                            </div>
+                            <% } else { %>
+                              <!-- Login/Signup Links -->
+                              <div class="navbar-auth">
+                                <a class="navbar-auth-link" href="/auth/login">Login</a>
+                                <a class="navbar-auth-btn" href="/auth/signup">Sign Up</a>
+                              </div>
+                              <% } %>
     </div>
-    
+
     <!-- Mobile menu button -->
     <button id="mobile-menu-button" class="navbar-mobile-toggle">
       <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -64,7 +70,7 @@
       </svg>
     </button>
   </div>
-  
+
   <!-- Mobile menu -->
   <div id="mobile-menu" class="navbar-mobile-menu">
     <div class="navbar-mobile-nav">
@@ -72,48 +78,53 @@
       <a class="navbar-mobile-link" href="/about">About</a>
       <a class="navbar-mobile-link" href="/resources">Resources</a>
       <a class="navbar-mobile-link" href="/disasters">Live Disasters</a>
-      <% if (typeof user !== 'undefined' && user) { %>
-        <% if (user.role === 'admin') { %>
+      <% if (typeof user !=='undefined' && user) { %>
+        <% if (user.role==='admin' ) { %>
           <a class="navbar-mobile-link" href="/admin/dashboard">Dashboard</a>
           <a class="navbar-mobile-link" href="/admin/manage-volunteers">Manage Users</a>
           <a class="navbar-mobile-link" href="/admin/volunteer-reports">Volunteer Reports</a>
           <a class="navbar-mobile-link" href="/admin/approvals">Approve NGOs</a>
-        <% } %>
-        <% if (user.role === 'ngo') { %>
-          <a class="navbar-mobile-link" href="/ngo/dashboard">My Campaigns</a>
-          <a class="navbar-mobile-link" href="/ngo/campaigns/old">Old Campaigns</a>
-          <a class="navbar-mobile-link" href="/ngo/upload-proof">Upload Proof</a>
-        <% } %>
-        <% if (user.role === 'volunteer') { %>
-          <a class="navbar-mobile-link" href="/volunteer/dashboard">Tasks</a>
-          <a class="navbar-mobile-link" href="/volunteer/tasks/completed">Completed Tasks</a>
-        <% } %>
-        <% if (user.role === 'donor') { %>
-          <a class="navbar-mobile-link" href="/donate">Donate</a>
-          <a class="navbar-mobile-link" href="/donor/home">My Donations</a>
-        <% } %>
-      <% } %>
-      
-      <% if (typeof user !== 'undefined' && user) { %>
-        <div class="navbar-mobile-auth">
-          <div class="navbar-mobile-user">
-            <div class="navbar-avatar"><%= user.name.charAt(0).toUpperCase() %></div>
-            <div class="navbar-user-details">
-              <div class="navbar-user-name"><%= user.name %></div>
-              <div class="navbar-user-role"><%= user.role %></div>
-            </div>
-          </div>
-          <form action="/auth/logout" method="POST">
-            <button type="submit" class="navbar-logout">Logout</button>
-          </form>
-        </div>
-      <% } else { %>
-        <div class="navbar-mobile-auth">
-          <a class="navbar-mobile-link" href="/auth/login">Login</a>
-          <a class="navbar-auth-btn" href="/auth/signup">Sign Up</a>
-        </div>
-      <% } %>
+          <% } %>
+            <% if (user.role==='ngo' ) { %>
+              <a class="navbar-mobile-link" href="/ngo/dashboard">My Campaigns</a>
+              <a class="navbar-mobile-link" href="/ngo/campaigns/old">Old Campaigns</a>
+              <a class="navbar-mobile-link" href="/ngo/upload-proof">Upload Proof</a>
+              <% } %>
+                <% if (user.role==='volunteer' ) { %>
+                  <a class="navbar-mobile-link" href="/volunteer/dashboard">Tasks</a>
+                  <a class="navbar-mobile-link" href="/volunteer/tasks/completed">Completed Tasks</a>
+                  <% } %>
+                    <% if (user.role==='donor' ) { %>
+                      <a class="navbar-mobile-link" href="/donate">Donate</a>
+                      <a class="navbar-mobile-link" href="/donor/home">My Donations</a>
+                      <% } %>
+                        <% } %>
+
+                          <% if (typeof user !=='undefined' && user) { %>
+                            <div class="navbar-mobile-auth">
+                              <div class="navbar-mobile-user">
+                                <div class="navbar-avatar">
+                                  <%= user.name.charAt(0).toUpperCase() %>
+                                </div>
+                                <div class="navbar-user-details">
+                                  <div class="navbar-user-name">
+                                    <%= user.name %>
+                                  </div>
+                                  <div class="navbar-user-role">
+                                    <%= user.role %>
+                                  </div>
+                                </div>
+                              </div>
+                              <form action="/auth/logout" method="POST">
+                                <button type="submit" class="navbar-logout">Logout</button>
+                              </form>
+                            </div>
+                            <% } else { %>
+                              <div class="navbar-mobile-auth">
+                                <a class="navbar-mobile-link" href="/auth/login">Login</a>
+                                <a class="navbar-auth-btn" href="/auth/signup">Sign Up</a>
+                              </div>
+                              <% } %>
     </div>
   </div>
 </nav>
-
