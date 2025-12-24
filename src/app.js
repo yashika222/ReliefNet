@@ -128,7 +128,7 @@ app.get('/', (req, res) => {
   if (req.user) {
     return res.redirect('/dashboard');
   }
-  res.render('pages/index', { title: 'Disaster Relief System' });
+  res.render('pages/home', { title: 'Disaster Relief System' });
 });
 
 // ✅ Routes
