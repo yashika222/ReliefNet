@@ -123,12 +123,31 @@ app.use((req, res, next) => {
 // Health route
 app.get('/health', (req, res) => res.status(200).json({ ok: true, timestamp: new Date() }));
 
+// Load Request model
+const Request = require('./models/Request');
+
 // ✅ Root Route
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
   if (req.user) {
     return res.redirect('/dashboard');
   }
-  res.render('pages/home', { title: 'Disaster Relief System' });
+  try {
+    const recentRequests = await Request.find()
+      .sort({ createdAt: -1 })
+      .limit(3)
+      .lean();
+    res.render('pages/home', {
+      title: 'Disaster Relief System',
+      recentRequests: recentRequests || []
+    });
+  } catch (err) {
+    console.error('Error fetching home data:', err);
+    // Render with empty list on error
+    res.render('pages/home', {
+      title: 'Disaster Relief System',
+      recentRequests: []
+    });
+  }
 });
 
 // ✅ Routes

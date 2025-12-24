@@ -62,7 +62,11 @@ const logger = require('./logger');
 const REQUIRED_ENV_VARS = [
   'NODE_ENV',
   'MONGO_URI',
-  'JWT_SECRET'
+  'JWT_SECRET',
+  'RAZORPAY_KEY_ID',
+  'RAZORPAY_KEY_SECRET',
+  'EMAIL_USER',
+  'EMAIL_PASS'
 ];
 
 function validateEnv() {
