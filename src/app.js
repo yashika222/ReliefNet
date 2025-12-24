@@ -31,12 +31,15 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.set('layout', 'layout');
+app.set('trust proxy', 1); // Trust first proxy (Render/Railway/Heroku)
 app.use(expressLayouts);
 
 app.use('/public', express.static(path.join(__dirname, '..', 'public')));
 
 // Middleware
 // Hardened Helmet + CSP configuration (no inline scripts)
+
+
 app.use(helmet({
   crossOriginEmbedderPolicy: false,
   crossOriginResourcePolicy: { policy: 'cross-origin' },
@@ -48,6 +51,7 @@ app.use(helmet({
       formAction: ["'self'"],
       scriptSrc: [
         "'self'",
+        "'unsafe-inline'", // Needed for EJS in-line scripts
         'https://cdn.jsdelivr.net',
         'https://cdnjs.cloudflare.com',
         'https://maps.googleapis.com',
@@ -55,7 +59,7 @@ app.use(helmet({
         'https://unpkg.com',
         'https://checkout.razorpay.com'
       ],
-      scriptSrcAttr: ["'none'"],
+      scriptSrcAttr: ["'unsafe-inline'"], // Allow inline event handlers
       styleSrc: [
         "'self'",
         "'unsafe-inline'",
@@ -105,10 +109,10 @@ app.use(requestLogger);
 app.get('/health', (req, res) => res.json({ ok: true }));
 
 // ✅ Railway safe root route
-app.get('/', (req, res) => {
-  res.status(200).send('ReliefNet backend running 🚀');
-});
 
+app.get('/', (req, res) => {
+  res.status(200).send('OK');
+});
 
 // ✅ Routes
 app.use('/', indexRoutes);
@@ -137,11 +141,11 @@ app.use((req, res) => {
 // Error handler
 app.use((err, req, res, next) => {
   logger.error('Unhandled error', { error: err.message, stack: err.stack });
- res.status(500).json({
-  message: 'Internal Server Error',
-  error: err.message
-});
-  
+  res.status(500).json({
+    message: 'Internal Server Error',
+    error: err.message
+  });
+
 });
 
 module.exports = app;
