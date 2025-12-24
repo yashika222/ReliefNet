@@ -68,6 +68,14 @@ apiRouter.post('/volunteers/:id/reset-password', safeHandler('resetVolunteerPass
 apiRouter.delete('/volunteers/:id', safeHandler('deleteVolunteer', volunteerCtrl.deleteVolunteer));
 apiRouter.post('/volunteers/:id/assign-task',
   body('title').notEmpty().withMessage('Title is required'),
+  // Validation Check Middleware
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg, errors: errors.array() });
+    }
+    next();
+  },
   safeHandler('assignTask', volunteerCtrl.assignTask)
 );
 apiRouter.put('/volunteers/:id/warn', safeHandler('warnVolunteer', volunteerCtrl.warnVolunteer));
@@ -188,18 +196,18 @@ router.get('/volunteer-reports', requireAuth, ensureRole('admin'), async (req, r
     const skip = (pageNumber - 1) * limitNumber;
 
     const query = { 'report.submittedAt': { $exists: true, $ne: null } };
-    
+
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
         { 'report.description': { $regex: search, $options: 'i' } }
       ];
     }
-    
+
     if (volunteerId) {
       query.volunteerId = volunteerId;
     }
-    
+
     if (status) {
       query.status = status;
     }

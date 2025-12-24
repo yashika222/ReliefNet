@@ -14,6 +14,15 @@ function getTransporter() {
   // 2. Try generic EMAIL config (common for Gmail)
   const { EMAIL_SERVICE, EMAIL_USER, EMAIL_PASS } = process.env;
 
+  // STRICT CHECK FOR PRODUCTION
+  if (process.env.NODE_ENV === 'production') {
+    if (!((SMTP_HOST && SMTP_USER && SMTP_PASS) || (EMAIL_USER && EMAIL_PASS))) {
+      console.error('❌ FATAL: Missing Email Environment Variables in Production!');
+      console.error('Required: SMTP_HOST, SMTP_USER, SMTP_PASS OR EMAIL_USER, EMAIL_PASS');
+      throw new Error('Email configuration missing in production environment.');
+    }
+  }
+
   if (SMTP_HOST && SMTP_USER && SMTP_PASS) {
     transporter = nodemailer && nodemailer.createTransport ? nodemailer.createTransport({
       host: SMTP_HOST,

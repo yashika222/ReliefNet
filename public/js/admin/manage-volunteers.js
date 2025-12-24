@@ -112,7 +112,7 @@
     attachEventListeners();
     refreshAll();
     loadDisasters();
-    
+
     // Check for volunteer query parameter and open profile modal
     const urlParams = new URLSearchParams(window.location.search);
     const volunteerId = urlParams.get('volunteer');
@@ -514,13 +514,12 @@
       elements.profile.email.textContent = volunteer.email || '';
       elements.profile.emailLink.href = volunteer.email ? `mailto:${volunteer.email}` : '#';
       elements.profile.approvalBadge.textContent = (volunteer.approvalStatus || 'pending').toUpperCase();
-      elements.profile.approvalBadge.className = `badge rounded-pill ${
-        volunteer.approvalStatus === 'approved'
+      elements.profile.approvalBadge.className = `badge rounded-pill ${volunteer.approvalStatus === 'approved'
           ? 'bg-success'
           : volunteer.approvalStatus === 'rejected'
             ? 'bg-secondary'
             : 'bg-warning text-dark'
-      }`;
+        }`;
 
       if (volunteer.blocked) {
         elements.profile.blockedBadge.classList.remove('d-none');
@@ -592,8 +591,13 @@
 
     async function handleAssignTaskSubmit(event) {
       event.preventDefault();
+      console.log('Admin: Assign Task form submitted'); // Debug log
+
       const volunteerId = elements.assignVolunteerIdInput.value;
-      if (!volunteerId) return;
+      if (!volunteerId) {
+        console.error('Admin: No volunteer ID found in form');
+        return;
+      }
       const payload = {
         title: elements.taskTitle.value.trim(),
         description: elements.taskDescription.value.trim(),
@@ -626,8 +630,13 @@
 
     async function handleEmailSubmit(event) {
       event.preventDefault();
+      console.log('Admin: Email form submitted'); // Debug log
+
       const volunteerId = elements.emailVolunteerId.value;
-      if (!volunteerId) return;
+      if (!volunteerId) {
+        console.error('Admin: No volunteer ID found in email form');
+        return;
+      }
       const payload = {
         subject: elements.emailSubject.value.trim(),
         message: elements.emailMessage.value.trim()
