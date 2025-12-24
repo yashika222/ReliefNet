@@ -11,6 +11,7 @@ const { validateEnv } = require('./src/config/env');
 
 const PORT = process.env.PORT || 3000;
 
+
 // Global error handlers
 process.on('uncaughtException', (err) => {
   logger.error('Uncaught Exception', { error: err.message, stack: err.stack });

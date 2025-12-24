@@ -34,7 +34,7 @@
                       <% } %>
                         <% } %>
 
-                          <% if (typeof user !=='undefined' && user && user.name) { %>
+                          <% if (typeof user !=='undefined' && user) { %>
                             <!-- User Section -->
                             <div class="navbar-user">
                               <div class="navbar-user-info">
@@ -43,7 +43,7 @@
                                 </div>
                                 <div class="navbar-user-details">
                                   <div class="navbar-user-name">
-                                    <%= user.name %>
+                                    <%= user.name || 'User' %>
                                   </div>
                                   <div class="navbar-user-role">
                                     <%= user.role %>
@@ -100,7 +100,7 @@
                       <% } %>
                         <% } %>
 
-                          <% if (typeof user !=='undefined' && user && user.name) { %>
+                          <% if (typeof user !=='undefined' && user) { %>
                             <div class="navbar-mobile-auth">
                               <div class="navbar-mobile-user">
                                 <div class="navbar-avatar">
@@ -108,7 +108,7 @@
                                 </div>
                                 <div class="navbar-user-details">
                                   <div class="navbar-user-name">
-                                    <%= user.name %>
+                                    <%= user.name || 'User' %>
                                   </div>
                                   <div class="navbar-user-role">
                                     <%= user.role %>
