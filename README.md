@@ -1,98 +1,91 @@
-# Disaster Relief Resource System
+🌍 ReliefNet – Emergency Disaster Response Network
+📌 Overview
 
-A comprehensive full-stack Node.js + Express + MongoDB + EJS + Socket.io application for coordinating disaster relief efforts with authentication-first approach.
+ReliefNet is a web-based disaster management platform that helps people during emergencies by providing features like SOS alerts, volunteer coordination, live disaster mapping, and donation support.
+It is designed to improve communication and response time during natural disasters such as floods, fires, and earthquakes.
 
-## 🚀 Quick Start
+🚀 Key Features
+🆘 SOS Alert System
+Send emergency alerts quickly
+Share location details for faster help
+🗺️ Live Disaster Mapping
+View affected areas on map
+Identify high-risk zones
+👨‍🚒 Volunteer Management
+Register as a volunteer
+Manage and track activities
+💰 Donation System
+Contribute resources easily
+Simple and user-friendly interface
+🌦️ Weather Updates
+Display current weather conditions
+Helps users stay prepared
+🔐 Authentication System
+Login and Signup functionality
+Secure access for users
+🛠️ Tech Stack
+Category	Technologies Used
+Frontend	HTML5, CSS3, JavaScript
+Styling	Bootstrap, Tailwind CSS
+APIs	Google Maps API
+Libraries	Chart.js, Font Awesome
+📂 Project Structure
+ReliefNet/
+│
+├── index.html
+├── SOS.html
+├── sosConfirm.html
+├── volunteer.html
+├── payment.html
+├── suslogin.html
+│
+├── css/
+│   └── styles.css
+│
+├── js/
+│   └── script.js
+│
+└── images/
+⚙️ Installation & Setup
+1️⃣ Clone the Repository
+git clone https://github.com/yashika222/ReliefNet.git
+cd ReliefNet
+2️⃣ Configure Google Maps API
 
-### Prerequisites
-- **Node.js** (version 18 or higher)
-- **MongoDB** (local installation or MongoDB Atlas)
+Replace API key in index.html:
 
-### Setup Instructions
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
+3️⃣ Run the Project
+Open index.html in your browser
+🧩 How It Works
+User logs into the system
+Sends SOS alert during emergency
+Location is shared via map
+Volunteers can view and respond
+Donations can be made to support victims
+🎯 Applications
+Disaster Management Systems
+Emergency Response Platforms
+Community Support Systems
+Volunteer Coordination Platforms
+🔮 Future Enhancements
+Real-time backend integration
+Push notifications for alerts
+Mobile app version
+AI-based disaster prediction
+🤝 Contribution Guidelines
+Fork the repository
+Create a new branch (feature-name)
+Commit your changes
+Push to GitHub
+Create a Pull Request
+📬 Contact
+GitHub: https://github.com/yashika222
+Project Repository: https://github.com/yashika222/ReliefNet
+📄 License
 
-1. **Install Dependencies**
-```bash
-npm install
-```
+This project is for educational purposes and open for contributions.
 
-2. **Environment Setup**
-Create a `.env` file in your project root:
-```env
-PORT=3000
-MONGODB_URI=mongodb://127.0.0.1:27017/disaster_relief
-JWT_SECRET=your-super-secret-jwt-key-here
-NODE_ENV=development
-```
+❤️ Acknowledgement
 
-3. **Start MongoDB**
-- **Local**: Make sure MongoDB is running on your system
-- **Atlas**: Use your cloud connection string in the `.env` file
-
-4. **Run the Application**
-```bash
-# Development mode (with auto-restart)
-npm run dev
-
-# Production mode
-npm start
-```
-
-5. **Access the Application**
-Open your browser and go to: **http://localhost:3000**
-
-### 🔐 Authentication-First Approach
-- **All routes require authentication** - users must login/signup first
-- **Role-based access** - Different user types (Admin, Donor, NGO, Volunteer, Victim)
-- **Secure sessions** - JWT tokens with HTTP-only cookies
-
-## Features Delivered (Phase 1)
-- Navigation: Home, About, Resources, Request Help, Donate, Login, Signup
-- EJS Frontend with TailwindCSS CDN
-- REST APIs (Auth, Resources - basic)
-- MongoDB with Mongoose
-- WebSocket channel for urgent alerts
-- Logging to files (Winston)
-
-## Project Structure
-```
-/ (root)
-  server.js
-  src/
-    app.js
-    config/
-      db.js, logger.js, socket.js
-    models/
-      User.js, Resource.js, Request.js, Donation.js, VolunteerTask.js
-    routes/
-      index.js, auth.js, resources.js
-    views/
-      layout.ejs
-      partials/navbar.ejs, partials/footer.ejs
-      pages/*.ejs
-  public/
-  logs/
-```
-
-## Syllabus Mapping (Highlights)
-- Node.js Fundamentals: documented and used (modules, npm, scripts)
-- Async & FS: async/await in DB/API; logging to files
-- APIs & Express: REST routes, middleware, validation
-- EJS templating: pages & layout
-- WebSocket: urgent alerts via socket.io
-- MongoDB: Mongoose models and CRUD
-- Web Security: helmet, rate-limit, JWT scaffolding in auth
-- Testing: Jest setup (tests to be added)
-- Deployment: To be added (AWS, PM2)
-
-## Scripts
-- `npm run dev` - start with nodemon
-- `npm start` - start server
-- `npm test` - run Jest tests
-
-## Next Steps
-- Implement full CRUD for donations, requests, volunteers, admin dashboard
-- Role-based auth middleware and protected routes
-- EJS reports and admin pages
-- Upload receipts to S3
-- Tests (unit, functional, integration)
-- Deployment guide
+Built with the aim of helping communities respond better during emergencies.
